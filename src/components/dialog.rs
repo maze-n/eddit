@@ -18,39 +18,34 @@
  */
 
 use gtk::*;
-use pango::*;
-use sourceview::*;
+use std::path::PathBuf;
 
-pub struct Content {
-    pub container: ScrolledWindow,
-    pub view: View,
-    pub buff: Buffer,
-}
+pub struct OpenDialog (FileChooserDialog);
 
-impl Content {
-    pub fn new () -> Content {
-        let container = ScrolledWindow::new (None, None);
-        let buff = Buffer::new (None);
-        let view = View::new_with_buffer (&buff);
+impl OpenDialog {
+    pub fn new (path: Option<PathBuf>) -> OpenDialog {
+        let open_dialog = FileChooserDialog::new (
+            Some("Open"),
+            Some(&Window::new (WindowType::Popup)),
+            FileChooserAction::Open,
+        );
 
-        config_sourceview (&view);
+        open_dialog.add_button ("Cancel", ResponseType::Cancel.into ());
+        open_dialog.add_button ("Open", ResponseType::Ok.into ());
 
-        container.add (&view);
+        path.map (|p| open_dialog.set_current_folder (p));
+        OpenDialog (open_dialog)
+    }
 
-        Content {
-            container,
-            buff,
-            view,
+    pub fn run(&self) -> Option<PathBuf> {
+        if self.0.run () == ResponseType::Ok.into () {
+            self.0.get_filename ()
+        } else {
+            None
         }
     }
 }
 
-fn config_sourceview (view: &View) {
-    WidgetExt::override_font (view, &FontDescription::from_string ("monospace 12"));
-    view.set_show_line_numbers(true);
-    view.set_monospace(true);
-    view.set_indent_width(4);
-    view.set_smart_backspace(true);
-    view.set_right_margin(10);
-    view.set_left_margin(10);
+impl Drop for OpenDialog {
+    fn drop(&mut self) { self.0.destroy(); }
 }

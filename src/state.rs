@@ -17,40 +17,27 @@
  * Authored by: mazen <https://github.com/maze-n>
  */
 
-use gtk::*;
-use pango::*;
-use sourceview::*;
+use std::path::{Path, PathBuf};
+use tiny_keccak::keccak512;
 
-pub struct Content {
-    pub container: ScrolledWindow,
-    pub view: View,
-    pub buff: Buffer,
+pub struct ActiveMetadata {
+    path: PathBuf,
+    sum: [u8; 64],
 }
 
-impl Content {
-    pub fn new () -> Content {
-        let container = ScrolledWindow::new (None, None);
-        let buff = Buffer::new (None);
-        let view = View::new_with_buffer (&buff);
-
-        config_sourceview (&view);
-
-        container.add (&view);
-
-        Content {
-            container,
-            buff,
-            view,
+impl ActiveMetadata {
+    pub fn new (path: PathBuf, data: &[u8]) ->ActiveMetadata {
+        ActiveMetadata {
+            path,
+            sum: keccak512 (data),
         }
     }
-}
 
-fn config_sourceview (view: &View) {
-    WidgetExt::override_font (view, &FontDescription::from_string ("monospace 12"));
-    view.set_show_line_numbers(true);
-    view.set_monospace(true);
-    view.set_indent_width(4);
-    view.set_smart_backspace(true);
-    view.set_right_margin(10);
-    view.set_left_margin(10);
+    pub fn get_path<'a> (&'a self) -> &'a Path { &self.path }
+
+    pub fn get_dir (&self) -> Option<PathBuf> { self.path.parent ().map (|p| p.to_path_buf ()) }
+    
+    pub fn is_same_as (&self, data: &[u8]) -> bool { &keccak512 (data)[..] == &self.sum[..] }
+    
+    pub fn set_sum (&mut self, data: &[u8]) { self.sum = keccak512(data); }
 }

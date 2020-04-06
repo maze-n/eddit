@@ -18,39 +18,18 @@
  */
 
 use gtk::*;
-use pango::*;
 use sourceview::*;
+use std::path::Path;
 
-pub struct Content {
-    pub container: ScrolledWindow,
-    pub view: View,
-    pub buff: Buffer,
-}
-
-impl Content {
-    pub fn new () -> Content {
-        let container = ScrolledWindow::new (None, None);
-        let buff = Buffer::new (None);
-        let view = View::new_with_buffer (&buff);
-
-        config_sourceview (&view);
-
-        container.add (&view);
-
-        Content {
-            container,
-            buff,
-            view,
-        }
+pub fn set_title (headerbar: &HeaderBar, path: &Path) {
+    if let Some (filename) = path.file_name () {
+        let filename: &str = &filename.to_string_lossy ();
+        headerbar.set_title (filename);
     }
 }
 
-fn config_sourceview (view: &View) {
-    WidgetExt::override_font (view, &FontDescription::from_string ("monospace 12"));
-    view.set_show_line_numbers(true);
-    view.set_monospace(true);
-    view.set_indent_width(4);
-    view.set_smart_backspace(true);
-    view.set_right_margin(10);
-    view.set_left_margin(10);
+pub fn get_buffer (buffer: &Buffer) -> Option<String> {
+    let start = buffer.get_start_iter ();
+    let end = buffer.get_end_iter ();
+    buffer.get_text (&start, &end, true)
 }
