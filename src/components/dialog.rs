@@ -31,6 +31,10 @@ impl OpenDialog {
             Some (&Window::new (WindowType::Popup)),
             FileChooserAction::Open,
         );
+        let filter = FileFilter::new ();
+        filter.add_mime_type ("text/plain");
+        filter.set_name ("Text files");
+        open_dialog.add_filter (&filter);
 
         open_dialog.add_button ("Cancel", ResponseType::Cancel.into ());
         open_dialog.add_button ("Open", ResponseType::Ok.into ());

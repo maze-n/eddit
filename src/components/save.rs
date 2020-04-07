@@ -70,7 +70,7 @@ fn write_data (path: Option<&ActiveMetadata>, data: &[u8]) -> io::Result<SaveAct
 
     let save_dialog = SaveDialog::new (None);
     if let Some (new_path) = save_dialog.run () {
-        let mut file = OpenOptions::new ().create (true).write (true).truncate (false).open (&new_path)?;
+        let mut file = OpenOptions::new ().create (true).write (true).truncate (true).open (&new_path)?;
         file.write_all (&data)?;
         Ok (SaveAction::New (ActiveMetadata::new (new_path, data)))
     } else {

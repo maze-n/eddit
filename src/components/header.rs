@@ -29,11 +29,12 @@ impl Header {
     pub fn new () -> Header {
         let container = HeaderBar::new ();
         container.set_title ("eddit");
-        container.set_subtitle ("Unsaved file");
         container.set_show_close_button (true);
 
         let open = Button::new_from_icon_name ("document-open", 32);
+        open.set_tooltip_text ("Open a file");
         let save = Button::new_from_icon_name ("document-save", 32);
+        save.set_tooltip_text ("Save file");
 
         container.pack_start (&open);
         container.pack_start (&save);
