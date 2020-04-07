@@ -17,8 +17,9 @@
  * Authored by: mazen <https://github.com/maze-n>
  */
 
- use super::{Header, Content, OpenDialog};
+use super::{Header, Content, OpenDialog};
 use super::misc::*;
+use super::save::*;
 use crate::state::ActiveMetadata;
 use std::sync::{Arc, RwLock};
 use std::fs::File;
@@ -50,7 +51,6 @@ impl App {
         window.set_default_size (800, 600);
         window.add (&content.container);
 
-        window.show_all ();
         window.connect_delete_event(move |_, _| {
             main_quit();
             Inhibit(false)
@@ -68,11 +68,24 @@ impl App {
         {
             let save = &self.header.save;
 
-            self.open_file (current_file);
-            //self.save_file ();
+            self.editor_changed (current_file.clone (), &self.header.save.clone ());
+            self.open_file (current_file.clone ());
+            self.save_file (&save.clone (), &save, current_file);
             //self.key_events ();
         }
         ConnectedApp (self)
+    }
+
+    pub fn editor_changed (&self, current_file: Arc<RwLock<Option<ActiveMetadata>>>, save_button: &Button) {
+        let save_button = save_button.clone ();
+        self.content.buff.connect_changed (move |editor| {
+            if let Some (text) = get_buffer (&editor) {
+                if let Some (ref current_file) = *current_file.read ().unwrap () {
+                    let has_same_sum = current_file.is_same_as (&text.as_bytes ());
+                    save_button.set_sensitive (!has_same_sum);
+                }
+            }
+        });
     }
 
     fn open_file (&self, current_file: Arc<RwLock<Option<ActiveMetadata>>>) {
@@ -105,6 +118,15 @@ impl App {
                 }
             }
         });
+    }
+
+    fn save_file (&self, save_button: &Button, actual_button: &Button, current_file: Arc<RwLock<Option<ActiveMetadata>>>) {
+        let editor = self.content.buff.clone ();
+        let headerbar = self.header.container.clone ();
+        let save_button = save_button.clone ();
+        actual_button.connect_clicked (
+            move |_| save (&editor, &headerbar, &save_button, &current_file),
+        );
     }
 }
 
