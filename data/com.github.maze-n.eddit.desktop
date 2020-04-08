@@ -1,0 +1,9 @@
+[Desktop Entry]
+Name=eddit
+GenericName=eddit
+Comment=A simple text editor.
+Categories=Accessories;TextTools;GTK;
+Icon=/usr/share/icons/hicolor/scalable/apps/com.github.maze-n.eddit.svg
+Exec=com.github.maze-n.eddit
+Terminal=false
+Type=Application
