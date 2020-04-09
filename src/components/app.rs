@@ -25,6 +25,7 @@ use std::sync::{Arc, RwLock};
 use std::fs::File;
 use std::io::Read;
 use gtk::*;
+use gio::{SettingsExt};
 
 pub struct App {
     pub window: Window,
@@ -45,13 +46,32 @@ impl App {
         let header = Header::new ();
         let content = Content::new ();
 
+        let settings = gio::Settings::new ("com.github.maze-n.eddit");
+        let pos_x = settings.get_int ("pos-x");
+        let pos_y = settings.get_int ("pos-y");
+        let window_width = settings.get_int ("window-width");
+        let window_height = settings.get_int ("window-height");
+        if pos_x ==-1 && pos_y ==-1 {
+            window.set_position (WindowPosition::Center);
+        } else {
+            window.move_ (pos_x, pos_y);
+        }
+        window.resize (window_width, window_height);
+
         window.set_titlebar (Some (&header.container));
         window.set_title ("eddit");
         window.set_wmclass ("text-editor", "eddit");
         window.set_default_size (800, 600);
         window.add (&content.container);
 
-        window.connect_delete_event(move |_, _| {
+        window.connect_delete_event(move |window, _| {
+            //let size = window.get_size ();
+            let position = window.get_position ();
+            settings.set_int ("pos-x", position.0);
+            settings.set_int ("pos-y", position.1);
+            //FIXME: For some reason only the first two set_int()'s seems to be working
+            //settings.set_int ("window-width", size.0);
+            //settings.set_int ("window-height", size.1);
             main_quit();
             Inhibit(false)
         });
