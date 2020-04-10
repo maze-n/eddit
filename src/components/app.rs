@@ -17,13 +17,12 @@
  * Authored by: mazen <https://github.com/maze-n>
  */
 
-use super::{Header, Content, OpenDialog};
+use super::{Header, Content};
+use gdk::CONTROL_MASK;
 use super::misc::*;
-use super::save::*;
+use super::file_operations::*;
 use crate::state::ActiveMetadata;
 use std::sync::{Arc, RwLock};
-use std::fs::File;
-use std::io::Read;
 use gtk::*;
 use gio::{SettingsExt};
 
@@ -90,8 +89,8 @@ impl App {
 
             self.editor_changed (current_file.clone (), &self.header.save.clone ());
             self.open_file (current_file.clone ());
-            self.save_file (&save.clone (), &save, current_file);
-            //self.key_events ();
+            self.save_file (&save.clone (), &save, current_file.clone ());
+            self.key_events (current_file);
         }
         ConnectedApp (self)
     }
@@ -112,32 +111,9 @@ impl App {
         let editor = self.content.buff.clone ();
         let headerbar = self.header.container.clone ();
 
-        self.header.open.connect_clicked (move |_| {
-            let open_dialog = OpenDialog::new ({
-                let lock = current_file.read ().unwrap ();
-                if let Some(ref path) = *lock {
-                    path.get_dir ()
-                } else {
-                    None
-                }
-            });
-
-            if let Some (new_file) = open_dialog.run () {
-                if let Ok (mut file) = File::open (&new_file) {
-                    let mut contents = String::new ();
-                    let _ = file.read_to_string (&mut contents);
-                    
-                    set_title (&headerbar, &new_file);
-                    if let Some (parent) = new_file.parent () {
-                        let subtitle: &str = &parent.to_string_lossy ();
-                        headerbar.set_subtitle (subtitle);
-                    }
-
-                    *current_file.write ().unwrap () = Some (ActiveMetadata::new (new_file, &contents.as_bytes ()));
-                    editor.set_text (&contents);
-                }
-            }
-        });
+        self.header.open.connect_clicked (
+            move |_| open (&editor, &headerbar, &current_file),
+        );
     }
 
     fn save_file (&self, save_button: &Button, actual_button: &Button, current_file: Arc<RwLock<Option<ActiveMetadata>>>) {
@@ -147,6 +123,26 @@ impl App {
         actual_button.connect_clicked (
             move |_| save (&editor, &headerbar, &save_button, &current_file),
         );
+    }
+
+    fn key_events (&self, current_file: Arc<RwLock<Option<ActiveMetadata>>>) {
+        let editor = self.content.buff.clone ();
+        let headerbar = self.header.container.clone ();
+        let save_button = self.header.save.clone ();
+
+        self.window.connect_key_press_event (move |_, gdk| {
+            match gdk.get_keyval () {
+                key if key == 's' as u32 && gdk.get_state ().contains (CONTROL_MASK) => {
+                    save (&editor, &headerbar, &save_button, &current_file);
+                },
+                key if key == 'o' as u32 && gdk.get_state ().contains (CONTROL_MASK) => {
+                    open (&editor, &headerbar, &current_file);
+                }
+
+                _ => (),
+            }
+            Inhibit (false)
+        });
     }
 }
 

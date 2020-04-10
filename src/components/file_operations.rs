@@ -18,12 +18,14 @@
  */
 
 use super::SaveDialog;
+use super::OpenDialog;
 use super::misc::*;
 use gtk::*;
 use sourceview::*;
 use crate::state::ActiveMetadata;
+use std::fs::File;
 use std::fs::OpenOptions;
-use std::io::{self, Write};
+use std::io::{self, Write, Read};
 use std::sync::RwLock;
 
 pub enum SaveAction {
@@ -75,5 +77,32 @@ fn write_data (path: Option<&ActiveMetadata>, data: &[u8]) -> io::Result<SaveAct
         Ok (SaveAction::New (ActiveMetadata::new (new_path, data)))
     } else {
         Ok (SaveAction::Canceled)
+    }
+}
+
+pub fn open (editor: &Buffer, headerbar: &HeaderBar, current_file: &RwLock<Option<ActiveMetadata>>) {
+    let open_dialog = OpenDialog::new ({
+        let lock = current_file.read ().unwrap ();
+        if let Some(ref path) = *lock {
+            path.get_dir ()
+        } else {
+            None
+        }
+    });
+
+    if let Some (new_file) = open_dialog.run () {
+        if let Ok (mut file) = File::open (&new_file) {
+            let mut contents = String::new ();
+            let _ = file.read_to_string (&mut contents);
+            
+            set_title (&headerbar, &new_file);
+            if let Some (parent) = new_file.parent () {
+                let subtitle: &str = &parent.to_string_lossy ();
+                headerbar.set_subtitle (subtitle);
+            }
+
+            *current_file.write ().unwrap () = Some (ActiveMetadata::new (new_file, &contents.as_bytes ()));
+            editor.set_text (&contents);
+        }
     }
 }

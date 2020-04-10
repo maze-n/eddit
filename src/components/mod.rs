@@ -22,7 +22,7 @@ mod header;
 mod content;
 mod dialog;
 pub mod misc;
-pub mod save;
+pub mod file_operations;
 
 pub use self::app::App;
 pub use self::header::Header;

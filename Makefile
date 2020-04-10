@@ -1,6 +1,6 @@
 .PHONY: clean clean-all install uninstall
 
-target/release/gDiceRoller : src
+target/release/eddit : src
 	cargo build --release
 
 install : target/release/eddit

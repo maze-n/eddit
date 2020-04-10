@@ -32,9 +32,9 @@ impl Header {
         container.set_show_close_button (true);
 
         let open = Button::new_from_icon_name ("document-open", 32);
-        open.set_tooltip_text ("Open a file");
+        open.set_tooltip_text ("Open a file\n   Ctrl + O");
         let save = Button::new_from_icon_name ("document-save", 32);
-        save.set_tooltip_text ("Save file");
+        save.set_tooltip_text ("Save file\n Ctrl + S");
 
         container.pack_start (&open);
         container.pack_start (&save);
