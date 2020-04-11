@@ -24,6 +24,7 @@ use gtk::*;
 use sourceview::*;
 use crate::state::ActiveMetadata;
 use std::fs::File;
+use std::path::PathBuf;
 use std::fs::OpenOptions;
 use std::io::{self, Write, Read};
 use std::sync::RwLock;
@@ -104,5 +105,22 @@ pub fn open (editor: &Buffer, headerbar: &HeaderBar, current_file: &RwLock<Optio
             *current_file.write ().unwrap () = Some (ActiveMetadata::new (new_file, &contents.as_bytes ()));
             editor.set_text (&contents);
         }
+    }
+}
+
+pub fn open_from_files (editor: &Buffer, headerbar: &HeaderBar, current_file: &RwLock<Option<ActiveMetadata>>, path: String) {
+    let new_file = PathBuf::from (path);
+    if let Ok (mut file) = File::open (&new_file) {
+        let mut contents = String::new ();
+        let _ = file.read_to_string (&mut contents);
+        
+        set_title (&headerbar, &new_file);
+        if let Some (parent) = new_file.parent () {
+            let subtitle: &str = &parent.to_string_lossy ();
+            headerbar.set_subtitle (subtitle);
+        }
+
+        *current_file.write ().unwrap () = Some (ActiveMetadata::new (new_file, &contents.as_bytes ()));
+        editor.set_text (&contents);
     }
 }

@@ -23,6 +23,7 @@ use super::misc::*;
 use super::file_operations::*;
 use crate::state::ActiveMetadata;
 use std::sync::{Arc, RwLock};
+use std::env;
 use gtk::*;
 use gio::{SettingsExt};
 
@@ -110,6 +111,10 @@ impl App {
     fn open_file (&self, current_file: Arc<RwLock<Option<ActiveMetadata>>>) {
         let editor = self.content.buff.clone ();
         let headerbar = self.header.container.clone ();
+        let args: Vec<String> = env::args ().collect ();
+        if args.len () > 1 {
+            open_from_files (&editor, &headerbar, &current_file, args [1].clone ());
+        } 
 
         self.header.open.connect_clicked (
             move |_| open (&editor, &headerbar, &current_file),

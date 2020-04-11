@@ -3,6 +3,9 @@
 <h2 align="center">A simple text editor with GTK</h2>
 <p align="center"><img src="https://raw.githubusercontent.com/maze-n/eddit/master/res/screenshots/screenshot-1.png"></p>
 
+## Get:
+Download available packages from the <a href="https://github.com/maze-n/eddit/releases">release section</a>.
+
 ## Build From Source:
 You will need the following dependencies:
  - libgtk-3-dev
