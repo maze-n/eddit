@@ -18,7 +18,6 @@
  */
 
 use super::{Header, Content};
-use gdk::CONTROL_MASK;
 use super::misc::*;
 use super::file_operations::*;
 use crate::state::ActiveMetadata;
@@ -60,18 +59,17 @@ impl App {
 
         window.set_titlebar (Some (&header.container));
         window.set_title ("eddit");
-        window.set_wmclass ("text-editor", "eddit");
         window.set_default_size (800, 600);
         window.add (&content.container);
 
         window.connect_delete_event(move |window, _| {
-            //let size = window.get_size ();
+            let size = window.get_size ();
             let position = window.get_position ();
             settings.set_int ("pos-x", position.0);
             settings.set_int ("pos-y", position.1);
             //FIXME: For some reason only the first two set_int()'s seems to be working
-            //settings.set_int ("window-width", size.0);
-            //settings.set_int ("window-height", size.1);
+            settings.set_int ("window-width", size.0);
+            settings.set_int ("window-height", size.1);
             main_quit();
             Inhibit(false)
         });
@@ -137,10 +135,10 @@ impl App {
 
         self.window.connect_key_press_event (move |_, gdk| {
             match gdk.get_keyval () {
-                key if key == 's' as u32 && gdk.get_state ().contains (CONTROL_MASK) => {
+                key if key == 's' as u32 && gdk.get_state ().contains (gdk::ModifierType::CONTROL_MASK) => {
                     save (&editor, &headerbar, &save_button, &current_file);
                 },
-                key if key == 'o' as u32 && gdk.get_state ().contains (CONTROL_MASK) => {
+                key if key == 'o' as u32 && gdk.get_state ().contains (gdk::ModifierType::CONTROL_MASK) => {
                     open (&editor, &headerbar, &current_file);
                 }
 

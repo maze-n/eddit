@@ -5,18 +5,19 @@ authors = ["maze-n <mmaz999@outlook.com>"]
 edition = "2018"
 
 [dependencies]
-gdk = "0.6"
+gdk = "0.12.1"
 tiny-keccak = "1.4.0"
-pango = "0.2.0"
+pango = "0.8.0"
+glib = "0.9.3"
 
 [dependencies.sourceview]
 features = ["v3_18"]
-version = "0.2"
+version = "0.8.0"
 
 [dependencies.gtk]
 features = ["v3_22"]
-version = "0.2"
+version = "0.8.1"
 
 [dependencies.gio]
-version = ""
+version = "0.8.1"
 features = ["v2_44"]

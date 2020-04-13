@@ -18,18 +18,17 @@
  */
 
 use gtk::*;
-use sourceview::*;
+use glib::GString;
 use std::path::Path;
 
 pub fn set_title (headerbar: &HeaderBar, path: &Path) {
     if let Some (filename) = path.file_name () {
         let filename: &str = &filename.to_string_lossy ();
-        headerbar.set_title (filename);
+        headerbar.set_title (Some (filename));
     }
 }
 
-pub fn get_buffer (buffer: &Buffer) -> Option<String> {
-    let start = buffer.get_start_iter ();
-    let end = buffer.get_end_iter ();
+pub fn get_buffer (buffer: &TextBuffer) -> Option<GString> {
+    let (start, end) = buffer.get_bounds ();
     buffer.get_text (&start, &end, true)
 }

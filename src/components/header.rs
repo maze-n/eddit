@@ -28,13 +28,15 @@ pub struct Header {
 impl Header {
     pub fn new () -> Header {
         let container = HeaderBar::new ();
-        container.set_title ("eddit");
+        container.set_title (Some ("eddit"));
         container.set_show_close_button (true);
 
-        let open = Button::new_from_icon_name ("document-open", 32);
-        open.set_tooltip_text ("Open a file\n   Ctrl + O");
-        let save = Button::new_from_icon_name ("document-save", 32);
-        save.set_tooltip_text ("Save file\n Ctrl + S");
+        let open = Button::new_from_icon_name (Some ("document-open"), IconSize::LargeToolbar);
+        open.set_tooltip_text (Some ("Open a file\n   Ctrl + O"));
+        open.set_valign (Align::Center);
+        let save = Button::new_from_icon_name (Some ("document-save"), IconSize::LargeToolbar);
+        save.set_tooltip_text (Some ("Save file\n Ctrl + S"));
+        save.set_valign (Align::Center);
 
         container.pack_start (&open);
         container.pack_start (&save);

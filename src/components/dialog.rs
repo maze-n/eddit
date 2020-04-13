@@ -33,7 +33,7 @@ impl OpenDialog {
         );
         let filter = FileFilter::new ();
         filter.add_mime_type ("text/plain");
-        filter.set_name ("Text files");
+        filter.set_name (Some ("Text files"));
         open_dialog.add_filter (&filter);
 
         open_dialog.add_button ("Cancel", ResponseType::Cancel.into ());

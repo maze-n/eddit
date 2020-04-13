@@ -24,14 +24,15 @@ use sourceview::*;
 pub struct Content {
     pub container: ScrolledWindow,
     pub view: View,
-    pub buff: Buffer,
+    pub buff: TextBuffer,
 }
 
 impl Content {
     pub fn new () -> Content {
-        let container = ScrolledWindow::new (None, None);
-        let buff = Buffer::new (None);
-        let view = View::new_with_buffer (&buff);
+        let container = ScrolledWindow::new (NONE_ADJUSTMENT, NONE_ADJUSTMENT);
+        //let buff = Buffer::new (None);
+        let view = View::new ();
+        let buff = view.get_buffer ().unwrap ();
 
         config_sourceview (&view);
 

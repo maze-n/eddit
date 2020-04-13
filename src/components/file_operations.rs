@@ -21,7 +21,6 @@ use super::SaveDialog;
 use super::OpenDialog;
 use super::misc::*;
 use gtk::*;
-use sourceview::*;
 use crate::state::ActiveMetadata;
 use std::fs::File;
 use std::path::PathBuf;
@@ -35,7 +34,7 @@ pub enum SaveAction {
     Canceled,
 }
 
-pub fn save (editor: &Buffer, headerbar: &HeaderBar, save: &Button, current_file: &RwLock<Option<ActiveMetadata>>) {
+pub fn save (editor: &TextBuffer, headerbar: &HeaderBar, save: &Button, current_file: &RwLock<Option<ActiveMetadata>>) {
     if let Some (text) = get_buffer (editor) {
         let result = write_data (current_file.read ().unwrap ().as_ref (), text.as_bytes ());
 
@@ -44,7 +43,7 @@ pub fn save (editor: &Buffer, headerbar: &HeaderBar, save: &Button, current_file
                 set_title (headerbar, file.get_path ());
                 if let Some (parent) = file.get_dir () {
                     let subtitle: &str = &parent.to_string_lossy ();
-                    headerbar.set_subtitle (subtitle);
+                    headerbar.set_subtitle (Some (subtitle));
                 }
 
                 let mut current_file = current_file.write ().unwrap ();
@@ -81,7 +80,7 @@ fn write_data (path: Option<&ActiveMetadata>, data: &[u8]) -> io::Result<SaveAct
     }
 }
 
-pub fn open (editor: &Buffer, headerbar: &HeaderBar, current_file: &RwLock<Option<ActiveMetadata>>) {
+pub fn open (editor: &TextBuffer, headerbar: &HeaderBar, current_file: &RwLock<Option<ActiveMetadata>>) {
     let open_dialog = OpenDialog::new ({
         let lock = current_file.read ().unwrap ();
         if let Some(ref path) = *lock {
@@ -99,7 +98,7 @@ pub fn open (editor: &Buffer, headerbar: &HeaderBar, current_file: &RwLock<Optio
             set_title (&headerbar, &new_file);
             if let Some (parent) = new_file.parent () {
                 let subtitle: &str = &parent.to_string_lossy ();
-                headerbar.set_subtitle (subtitle);
+                headerbar.set_subtitle (Some (subtitle));
             }
 
             *current_file.write ().unwrap () = Some (ActiveMetadata::new (new_file, &contents.as_bytes ()));
@@ -108,7 +107,7 @@ pub fn open (editor: &Buffer, headerbar: &HeaderBar, current_file: &RwLock<Optio
     }
 }
 
-pub fn open_from_files (editor: &Buffer, headerbar: &HeaderBar, current_file: &RwLock<Option<ActiveMetadata>>, path: String) {
+pub fn open_from_files (editor: &TextBuffer, headerbar: &HeaderBar, current_file: &RwLock<Option<ActiveMetadata>>, path: String) {
     let new_file = PathBuf::from (path);
     if let Ok (mut file) = File::open (&new_file) {
         let mut contents = String::new ();
@@ -117,7 +116,7 @@ pub fn open_from_files (editor: &Buffer, headerbar: &HeaderBar, current_file: &R
         set_title (&headerbar, &new_file);
         if let Some (parent) = new_file.parent () {
             let subtitle: &str = &parent.to_string_lossy ();
-            headerbar.set_subtitle (subtitle);
+            headerbar.set_subtitle (Some (subtitle));
         }
 
         *current_file.write ().unwrap () = Some (ActiveMetadata::new (new_file, &contents.as_bytes ()));
