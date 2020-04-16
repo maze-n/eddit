@@ -20,6 +20,7 @@
 use gtk::*;
 use glib::GString;
 use std::path::Path;
+use gio::{SettingsExt};
 
 pub fn set_title (headerbar: &HeaderBar, path: &Path) {
     if let Some (filename) = path.file_name () {
@@ -31,4 +32,15 @@ pub fn set_title (headerbar: &HeaderBar, path: &Path) {
 pub fn get_buffer (buffer: &TextBuffer) -> Option<GString> {
     let (start, end) = buffer.get_bounds ();
     buffer.get_text (&start, &end, true)
+}
+
+pub fn before_quit (window: &Window) {
+    let size = window.get_size ();
+    let position = window.get_position ();
+    let settings = gio::Settings::new ("com.github.maze-n.eddit");
+    settings.set_int ("pos-x", position.0);
+    settings.set_int ("pos-y", position.1);
+    //FIXME: Only the first two set_int()'s are working .ie, only the pos-x and pos-y values are stored
+    settings.set_int ("window-width", size.0);
+    settings.set_int ("window-height", size.1);
 }

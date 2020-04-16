@@ -24,6 +24,7 @@ use crate::state::ActiveMetadata;
 use std::sync::{Arc, RwLock};
 use std::env;
 use gtk::*;
+use gtk::SettingsExt as GTKSettingsExt;
 use gio::{SettingsExt};
 use pango::*;
 
@@ -57,20 +58,20 @@ impl App {
             window.move_ (pos_x, pos_y);
         }
         window.resize (window_width, window_height);
+        if let Some (gtk_settings) = Settings::get_default () {
+            let is_dark = settings.get_boolean ("is-dark");
+            gtk_settings.set_property_gtk_application_prefer_dark_theme (is_dark);
+        }
 
         window.set_titlebar (Some (&header.container));
         window.set_title ("eddit");
         window.set_default_size (800, 600);
         window.add (&content.container);
 
-        window.connect_delete_event(move |window, _| {
-            let size = window.get_size ();
-            let position = window.get_position ();
-            settings.set_int ("pos-x", position.0);
-            settings.set_int ("pos-y", position.1);
-            //FIXME: For some reason only the first two set_int()'s seems to be working
-            settings.set_int ("window-width", size.0);
-            settings.set_int ("window-height", size.1);
+        let cloned_window = window.clone ();
+        
+        window.connect_delete_event(move |_, _| {
+            before_quit (&cloned_window);
             main_quit();
             Inhibit(false)
         });
@@ -86,7 +87,7 @@ impl App {
         let current_file = Arc::new (RwLock::new (None));
         {
             let save = &self.header.save;
-
+            self.theme_changed (&self.header.theme_switch);
             self.editor_changed (current_file.clone (), &self.header.save.clone ());
             self.open_file (current_file.clone ());
             self.save_file (&save.clone (), &save, current_file.clone ());
@@ -94,6 +95,20 @@ impl App {
             self.key_events (current_file);
         }
         ConnectedApp (self)
+    }
+
+    pub fn theme_changed (&self, theme_switch: &Switch) {
+        let settings = gio::Settings::new ("com.github.maze-n.eddit");
+        if let Some (gtk_settings) = Settings::get_default () {
+            theme_switch.set_state (gtk_settings.get_property_gtk_application_prefer_dark_theme ());
+        }
+        theme_switch.connect_state_set (move |theme_switch, _| {
+            if let Some (gtk_settings) = Settings::get_default () {
+                gtk_settings.set_property_gtk_application_prefer_dark_theme (!theme_switch.get_state ());
+                settings.set_boolean ("is-dark", !theme_switch.get_state ());
+            }
+            Inhibit (false)
+        });
     }
 
     pub fn editor_changed (&self, current_file: Arc<RwLock<Option<ActiveMetadata>>>, save_button: &Button) {

@@ -30,5 +30,11 @@
             <summary>Font name and size</summary>
             <description>The saved font style and size of the editor</description>
         </key>
+
+        <key name="is-dark" type="b">
+            <default>false</default>
+            <summary>Is dark theme is choosed</summary>
+            <description>True implies dark theme is selected</description>
+        </key>
     </schema>
 </schemalist>

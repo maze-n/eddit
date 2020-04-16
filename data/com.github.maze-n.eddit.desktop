@@ -1,7 +1,7 @@
 [Desktop Entry]
 Name=eddit
 GenericName=eddit
-Comment=A simple text editor.
+Comment=Edit text files
 Categories=Accessories;TextTools;GTK;
 Icon=/usr/share/icons/hicolor/scalable/apps/com.github.maze-n.eddit.svg
 Keywords=Text;Editor;

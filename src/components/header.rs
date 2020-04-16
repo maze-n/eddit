@@ -18,13 +18,14 @@
  */
 
 use gtk::*;
+use gtk::SettingsExt as GTKSettingsExt;
 use gio::{SettingsExt};
 
 pub struct Header {
     pub container: HeaderBar,
     pub open: Button,
     pub save: Button,
-    //pub theme_switch: Switch,
+    pub theme_switch: Switch,
     pub font_button: FontButton,
 }
 
@@ -32,6 +33,7 @@ impl Header {
     pub fn new () -> Header {
         let container = HeaderBar::new ();
         container.set_title (Some ("eddit"));
+        container.set_subtitle (Some ("New file"));
         container.set_show_close_button (true);
 
         let settings = gio::Settings::new ("com.github.maze-n.eddit");
@@ -77,8 +79,8 @@ impl Header {
             font_button.set_font (font.as_str ());
         }
 
-        //pop_container.pack_start (&theme_selector, true, true, 0);
-        //pop_container.pack_start (&Separator::new (Orientation::Horizontal), true, true, 6);
+        pop_container.pack_start (&theme_selector, true, true, 0);
+        pop_container.pack_start (&Separator::new (Orientation::Horizontal), true, true, 6);
         pop_container.pack_start (&font_button, true, true, 0);
         pop_container.show_all ();
 
@@ -94,7 +96,7 @@ impl Header {
             container,
             open,
             save,
-            //theme_switch,
+            theme_switch,
             font_button,
         }
     }
