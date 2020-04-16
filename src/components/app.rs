@@ -25,6 +25,7 @@ use std::sync::{Arc, RwLock};
 use std::env;
 use gtk::*;
 use gio::{SettingsExt};
+use pango::*;
 
 pub struct App {
     pub window: Window,
@@ -89,6 +90,7 @@ impl App {
             self.editor_changed (current_file.clone (), &self.header.save.clone ());
             self.open_file (current_file.clone ());
             self.save_file (&save.clone (), &save, current_file.clone ());
+            self.font_changed (&self.header.font_button);
             self.key_events (current_file);
         }
         ConnectedApp (self)
@@ -126,6 +128,18 @@ impl App {
         actual_button.connect_clicked (
             move |_| save (&editor, &headerbar, &save_button, &current_file),
         );
+    }
+
+    fn font_changed (&self, actual_button: &FontButton) {
+        let view = self.content.view.clone ();
+        let font_button = actual_button.clone ();
+        let settings = gio::Settings::new ("com.github.maze-n.eddit");
+        actual_button.connect_font_set (move |_| {
+            if let Some (fontname) = font_button.get_font_name () {
+                WidgetExt::override_font (&view, &FontDescription::from_string (fontname.as_str ()));
+                settings.set_string ("font", fontname.as_str ());
+            }
+        });
     }
 
     fn key_events (&self, current_file: Arc<RwLock<Option<ActiveMetadata>>>) {

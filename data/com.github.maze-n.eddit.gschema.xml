@@ -24,5 +24,11 @@
             <summary>Window Height</summary>
             <description>The saved height of the window</description>
         </key>
+
+        <key name="font" type="s">
+            <default>"monospace 12"</default>
+            <summary>Font name and size</summary>
+            <description>The saved font style and size of the editor</description>
+        </key>
     </schema>
 </schemalist>

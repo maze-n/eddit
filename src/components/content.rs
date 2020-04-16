@@ -18,6 +18,7 @@
  */
 
 use gtk::*;
+use gio::{SettingsExt};
 use pango::*;
 use sourceview::*;
 
@@ -34,7 +35,10 @@ impl Content {
         let view = View::new ();
         let buff = view.get_buffer ().unwrap ();
 
-        config_sourceview (&view);
+        let settings = gio::Settings::new ("com.github.maze-n.eddit");
+        if let Some (font) = settings.get_string ("font"){
+            config_sourceview (&view, font.as_str ().to_string ());
+        }
 
         container.add (&view);
 
@@ -46,8 +50,8 @@ impl Content {
     }
 }
 
-fn config_sourceview (view: &View) {
-    WidgetExt::override_font (view, &FontDescription::from_string ("monospace 12"));
+fn config_sourceview (view: &View, font: String) {
+    WidgetExt::override_font (view, &FontDescription::from_string (font.as_str ()));
     view.set_show_line_numbers(true);
     view.set_monospace(true);
     view.set_indent_width(4);
