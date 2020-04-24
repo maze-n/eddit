@@ -27,6 +27,7 @@ use std::path::PathBuf;
 use std::fs::OpenOptions;
 use std::io::{self, Write, Read};
 use std::sync::RwLock;
+use sourceview::*;
 
 pub enum SaveAction {
     New (ActiveMetadata),
@@ -34,7 +35,7 @@ pub enum SaveAction {
     Canceled,
 }
 
-pub fn save (editor: &TextBuffer, headerbar: &HeaderBar, save: &Button, current_file: &RwLock<Option<ActiveMetadata>>) {
+pub fn save (editor: &Buffer, headerbar: &HeaderBar, save: &Button, current_file: &RwLock<Option<ActiveMetadata>>) {
     if let Some (text) = get_buffer (editor) {
         let result = write_data (current_file.read ().unwrap ().as_ref (), text.as_bytes ());
 
@@ -80,7 +81,7 @@ fn write_data (path: Option<&ActiveMetadata>, data: &[u8]) -> io::Result<SaveAct
     }
 }
 
-pub fn open (editor: &TextBuffer, headerbar: &HeaderBar, current_file: &RwLock<Option<ActiveMetadata>>) {
+pub fn open (editor: &Buffer, headerbar: &HeaderBar, current_file: &RwLock<Option<ActiveMetadata>>) {
     let open_dialog = OpenDialog::new ({
         let lock = current_file.read ().unwrap ();
         if let Some(ref path) = *lock {
@@ -103,11 +104,12 @@ pub fn open (editor: &TextBuffer, headerbar: &HeaderBar, current_file: &RwLock<O
 
             *current_file.write ().unwrap () = Some (ActiveMetadata::new (new_file, &contents.as_bytes ()));
             editor.set_text (&contents);
+            editor.place_cursor (&editor.get_start_iter ());
         }
     }
 }
 
-pub fn open_from_files (editor: &TextBuffer, headerbar: &HeaderBar, current_file: &RwLock<Option<ActiveMetadata>>, path: String) {
+pub fn open_from_files (editor: &Buffer, headerbar: &HeaderBar, current_file: &RwLock<Option<ActiveMetadata>>, path: String) {
     let new_file = PathBuf::from (path);
     if let Ok (mut file) = File::open (&new_file) {
         let mut contents = String::new ();
@@ -121,5 +123,6 @@ pub fn open_from_files (editor: &TextBuffer, headerbar: &HeaderBar, current_file
 
         *current_file.write ().unwrap () = Some (ActiveMetadata::new (new_file, &contents.as_bytes ()));
         editor.set_text (&contents);
+        editor.place_cursor (&editor.get_start_iter ());
     }
 }

@@ -25,15 +25,20 @@ use sourceview::*;
 pub struct Content {
     pub container: ScrolledWindow,
     pub view: View,
-    pub buff: TextBuffer,
+    pub buff: Buffer,
+    pub search_settings: SearchSettings,
+    pub search_context: SearchContext,
 }
 
 impl Content {
     pub fn new () -> Content {
         let container = ScrolledWindow::new (NONE_ADJUSTMENT, NONE_ADJUSTMENT);
-        //let buff = Buffer::new (None);
-        let view = View::new ();
-        let buff = view.get_buffer ().unwrap ();
+        let buff = Buffer::new (Some (&TextTagTable::new ()));
+        let view = View::new_with_buffer (&buff);
+        let search_settings = SearchSettings::new ();
+        let search_context = SearchContext::new (&buff, Some (&search_settings));
+        buff.place_cursor (&buff.get_start_iter ());
+        buff.set_highlight_matching_brackets (false);
 
         let settings = gio::Settings::new ("com.github.maze-n.eddit");
         if let Some (font) = settings.get_string ("font"){
@@ -46,6 +51,8 @@ impl Content {
             container,
             buff,
             view,
+            search_settings,
+            search_context,
         }
     }
 }

@@ -21,10 +21,12 @@ mod app;
 mod header;
 mod content;
 mod dialog;
+mod searchbox;
 pub mod misc;
 pub mod file_operations;
 
 pub use self::app::App;
 pub use self::header::Header;
 pub use self::content::Content;
+pub use self::searchbox::SearchBox;
 pub use self::dialog::{OpenDialog, SaveDialog};

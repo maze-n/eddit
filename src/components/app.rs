@@ -17,7 +17,7 @@
  * Authored by: mazen <https://github.com/maze-n>
  */
 
-use super::{Header, Content};
+use super::{Header, Content, SearchBox};
 use super::misc::*;
 use super::file_operations::*;
 use crate::state::ActiveMetadata;
@@ -27,11 +27,14 @@ use gtk::*;
 use gtk::SettingsExt as GTKSettingsExt;
 use gio::{SettingsExt};
 use pango::*;
+use sourceview::*;
 
 pub struct App {
     pub window: Window,
     pub header: Header,
     pub content: Content,
+    pub search_bar: SearchBox,
+    pub revealer: Revealer,
 }
 
 pub struct ConnectedApp (App);
@@ -47,9 +50,18 @@ impl App {
         let header = Header::new ();
         let content = Content::new ();
 
+        let window_box = Box::new (Orientation::Vertical, 0);
+
+        let revealer = Revealer::new ();
+        let search_bar = SearchBox::new ();
+        revealer.set_transition_type (RevealerTransitionType::SlideDown);
+        revealer.add (&search_bar.container);
+
         let settings = gio::Settings::new ("com.github.maze-n.eddit");
         let pos_x = settings.get_int ("pos-x");
         let pos_y = settings.get_int ("pos-y");
+        settings.set_int ("pos-x", pos_x + 20);
+        settings.set_int ("pos-y", pos_y + 20);
         let window_width = settings.get_int ("window-width");
         let window_height = settings.get_int ("window-height");
         if pos_x ==-1 && pos_y ==-1 {
@@ -63,10 +75,13 @@ impl App {
             gtk_settings.set_property_gtk_application_prefer_dark_theme (is_dark);
         }
 
+        window_box.pack_start (&revealer, false, true, 0);
+        window_box.pack_start (&content.container, true, true, 0);
+
         window.set_titlebar (Some (&header.container));
         window.set_title ("eddit");
         window.set_default_size (800, 600);
-        window.add (&content.container);
+        window.add (&window_box);
 
         let cloned_window = window.clone ();
         
@@ -80,6 +95,8 @@ impl App {
             window,
             header,
             content,
+            search_bar,
+            revealer,
         }
     }
 
@@ -92,9 +109,110 @@ impl App {
             self.open_file (current_file.clone ());
             self.save_file (&save.clone (), &save, current_file.clone ());
             self.font_changed (&self.header.font_button);
+            self.find_replace (&self.header.find_button, &self.revealer, &self.search_bar.search_entry);
             self.key_events (current_file);
         }
         ConnectedApp (self)
+    }
+
+    pub fn find_replace (&self, find_button: &ToggleButton, revealer: &Revealer, search_entry: &SearchEntry) {
+        let revealer = revealer.clone ();
+        //let case_sens_button = self.search_bar.case_sens_button.clone ();
+        let search_entry = search_entry.clone ();
+        let up = self.search_bar.up.clone ();
+        let down = self.search_bar.down.clone ();
+        let replace_button = self.search_bar.replace_button.clone ();
+        let replace_all = self.search_bar.replace_all_button.clone ();
+        let replace_entry = self.search_bar.replace_entry.clone ();
+        let buff = self.content.buff.clone ();
+        let view = self.content.view.clone ();
+
+        let search_settings = self.content.search_settings.clone ();
+        let search_context = self.content.search_context.clone ();
+        let search_flag = TextSearchFlags::CASE_INSENSITIVE;
+
+        let search_settings_clone = search_settings.clone ();
+        let entry = search_entry.clone ();
+        find_button.connect_toggled (move |find_button| {
+            revealer.set_reveal_child (find_button.get_active ());
+            entry.grab_focus ();
+            search_settings_clone.set_search_text (Some (""));
+        });
+
+        //let search_settings_clone = search_settings.clone ();
+        //let case_sens_clone = case_sens_button.clone ();
+        //let search_flag_clone = search_flag.clone ();
+        //case_sens_clone.connect_toggled (move |case_sens_clone| {
+        //    search_settings_clone.set_case_sensitive (case_sens_clone.get_active ());
+        //});
+
+        let entry = search_entry.clone ();
+        let search_settings_clone = search_settings.clone ();
+        entry.connect_search_changed (move |entry| {
+            if let Some (text) = entry.get_text () {
+                search_settings_clone.set_search_text (Some (text.as_str ()));
+            }
+        });
+
+        let buffer = buff.clone ();
+        let search_settings_clone = search_settings.clone ();
+        let view_clone = view.clone ();
+        down.connect_clicked (move |_| {
+            if let Some (iters) = buffer.get_selection_bounds () {
+                let iter = iters.1;
+                if let Some (search_string) = search_settings_clone.get_search_text () {
+                    if let Some (mut match_iters) = iter.forward_search (search_string.as_str (), search_flag, None) {
+                        buffer.select_range (&match_iters.0, &match_iters.1);
+                        view_clone.scroll_to_iter (&mut match_iters.0, 0.0, false, 0.0, 0.0);
+                    }
+                }
+            } else {
+                let iter = buffer.get_iter_at_offset (buffer.get_property_cursor_position ());
+                if let Some (search_string) = search_settings_clone.get_search_text () {
+                    if let Some (mut match_iters) = iter.forward_search (search_string.as_str (), search_flag, None) {
+                        buffer.select_range (&match_iters.0, &match_iters.1);
+                        view_clone.scroll_to_iter (&mut match_iters.0, 0.0, false, 0.0, 0.0);
+                    }
+                }
+            }
+        });
+
+        let buffer = buff.clone ();
+        up.connect_clicked (move |_| {
+            if let Some (iters) = buffer.get_selection_bounds () {
+                let iter = iters.0;
+                if let Some (search_string) = search_settings.get_search_text () {
+                    if let Some (mut match_iters) = iter.backward_search (search_string.as_str (), TextSearchFlags::CASE_INSENSITIVE, None) {
+                        buffer.select_range (&match_iters.0, &match_iters.1);
+                        view.scroll_to_iter (&mut match_iters.0, 0.0, false, 0.0, 0.0);
+                    }
+                }
+            } else {
+                let iter = buffer.get_iter_at_offset (buffer.get_property_cursor_position ());
+                if let Some (search_string) = search_settings.get_search_text () {
+                    if let Some (mut match_iters) = iter.backward_search (search_string.as_str (), TextSearchFlags::CASE_INSENSITIVE, None) {
+                        buffer.select_range (&match_iters.0, &match_iters.1);
+                        view.scroll_to_iter (&mut match_iters.0, 0.0, false, 0.0, 0.0);
+                    }
+                }
+            }
+        });
+        
+        let search_context_clone = search_context.clone ();
+        let replace_entry_clone = replace_entry.clone ();
+        replace_button.connect_clicked (move |_| {
+            if let Some (match_selected) = buff.get_selection_bounds() {
+                if let Some (replace_text) = replace_entry_clone.get_text () {
+                    search_context_clone.replace (&match_selected.0, &match_selected.1, replace_text.as_str ());
+                }
+            }
+        });
+
+        replace_all.connect_clicked (move |_| {
+            if let Some (text) = replace_entry.get_text () {
+                search_context.replace_all (text.as_str ());
+            }
+        });
     }
 
     pub fn theme_changed (&self, theme_switch: &Switch) {
@@ -161,6 +279,8 @@ impl App {
         let editor = self.content.buff.clone ();
         let headerbar = self.header.container.clone ();
         let save_button = self.header.save.clone ();
+        let find_button = self.header.find_button.clone ();
+        let search_entry = self.search_bar.search_entry.clone ();
 
         self.window.connect_key_press_event (move |_, gdk| {
             match gdk.get_keyval () {
@@ -169,6 +289,13 @@ impl App {
                 },
                 key if key == 'o' as u32 && gdk.get_state ().contains (gdk::ModifierType::CONTROL_MASK) => {
                     open (&editor, &headerbar, &current_file);
+                }
+                key if key == 'f' as u32 && gdk.get_state ().contains (gdk::ModifierType::CONTROL_MASK) => {
+                    find_button.set_active (true);
+                    search_entry.grab_focus ();
+                }
+                key if key == gdk::enums::key::Escape => {
+                    find_button.set_active (false);
                 }
 
                 _ => (),

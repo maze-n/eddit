@@ -18,7 +18,6 @@
  */
 
 use gtk::*;
-use gtk::SettingsExt as GTKSettingsExt;
 use gio::{SettingsExt};
 
 pub struct Header {
@@ -27,6 +26,7 @@ pub struct Header {
     pub save: Button,
     pub theme_switch: Switch,
     pub font_button: FontButton,
+    pub find_button: ToggleButton,
 }
 
 impl Header {
@@ -47,7 +47,11 @@ impl Header {
         let menu_button = MenuButton::new ();
         menu_button.set_tooltip_text (Some ("Preferences"));
         menu_button.set_valign (Align::Center);
-        menu_button.set_image (Some(&Image::new_from_icon_name (Some ("open-menu"), IconSize::LargeToolbar)));
+        menu_button.set_image (Some (&Image::new_from_icon_name (Some ("open-menu"), IconSize::LargeToolbar)));
+        let find_button = ToggleButton::new ();
+        find_button.set_image (Some (&Image::new_from_icon_name (Some ("edit-find"), IconSize::LargeToolbar)));
+        find_button.set_valign (Align::Center);
+        find_button.set_tooltip_text (Some ("Find and replace\n         Ctrl + F"));
 
         let popover = Popover::new (Some (&menu_button));
         let pop_container = Box::new (Orientation::Vertical, 6);
@@ -91,6 +95,7 @@ impl Header {
         container.pack_start (&open);
         container.pack_start (&save);
         container.pack_end (&menu_button);
+        container.pack_end (&find_button);
 
         Header {
             container,
@@ -98,6 +103,7 @@ impl Header {
             save,
             theme_switch,
             font_button,
+            find_button,
         }
     }
 }

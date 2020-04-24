@@ -21,6 +21,7 @@ use gtk::*;
 use glib::GString;
 use std::path::Path;
 use gio::{SettingsExt};
+use sourceview::*;
 
 pub fn set_title (headerbar: &HeaderBar, path: &Path) {
     if let Some (filename) = path.file_name () {
@@ -29,7 +30,7 @@ pub fn set_title (headerbar: &HeaderBar, path: &Path) {
     }
 }
 
-pub fn get_buffer (buffer: &TextBuffer) -> Option<GString> {
+pub fn get_buffer (buffer: &Buffer) -> Option<GString> {
     let (start, end) = buffer.get_bounds ();
     buffer.get_text (&start, &end, true)
 }
