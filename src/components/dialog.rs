@@ -20,32 +20,32 @@
 use gtk::*;
 use std::path::PathBuf;
 
-pub struct OpenDialog (FileChooserDialog);
+pub struct OpenDialog(FileChooserDialog);
 
-pub struct SaveDialog (FileChooserDialog);
+pub struct SaveDialog(FileChooserDialog);
 
 impl OpenDialog {
-    pub fn new (path: Option<PathBuf>) -> OpenDialog {
-        let open_dialog = FileChooserDialog::new (
-            Some ("Open"),
-            Some (&Window::new (WindowType::Popup)),
+    pub fn new(path: Option<PathBuf>) -> OpenDialog {
+        let open_dialog = FileChooserDialog::new(
+            Some("Open"),
+            Some(&Window::new(WindowType::Popup)),
             FileChooserAction::Open,
         );
-        let filter = FileFilter::new ();
-        filter.add_mime_type ("text/plain");
-        filter.set_name (Some ("Text files"));
-        open_dialog.add_filter (&filter);
+        let filter = FileFilter::new();
+        filter.add_mime_type("text/plain");
+        filter.set_name(Some("Text files"));
+        open_dialog.add_filter(&filter);
 
-        open_dialog.add_button ("Cancel", ResponseType::Cancel.into ());
-        open_dialog.add_button ("Open", ResponseType::Ok.into ());
+        open_dialog.add_button("Cancel", ResponseType::Cancel.into());
+        open_dialog.add_button("Open", ResponseType::Ok.into());
 
-        path.map (|p| open_dialog.set_current_folder (p));
-        OpenDialog (open_dialog)
+        path.map(|p| open_dialog.set_current_folder(p));
+        OpenDialog(open_dialog)
     }
 
-    pub fn run (&self) -> Option<PathBuf> {
-        if self.0.run () == ResponseType::Ok.into () {
-            self.0.get_filename ()
+    pub fn run(&self) -> Option<PathBuf> {
+        if self.0.run() == ResponseType::Ok.into() {
+            self.0.get_filename()
         } else {
             None
         }
@@ -53,24 +53,24 @@ impl OpenDialog {
 }
 
 impl SaveDialog {
-    pub fn new (path: Option<PathBuf>) -> SaveDialog {
-        let save_dialog = FileChooserDialog::new (
-            Some ("Save"),
-            Some (&Window::new (WindowType::Popup)),
+    pub fn new(path: Option<PathBuf>) -> SaveDialog {
+        let save_dialog = FileChooserDialog::new(
+            Some("Save"),
+            Some(&Window::new(WindowType::Popup)),
             FileChooserAction::Save,
         );
 
-        save_dialog.add_button ("Cancel", ResponseType::Cancel.into ());
-        save_dialog.add_button ("Save", ResponseType::Ok.into ());
+        save_dialog.add_button("Cancel", ResponseType::Cancel.into());
+        save_dialog.add_button("Save", ResponseType::Ok.into());
 
-        path.map (|p| save_dialog.set_current_folder (p));
+        path.map(|p| save_dialog.set_current_folder(p));
 
-        SaveDialog (save_dialog)
+        SaveDialog(save_dialog)
     }
 
-    pub fn run (&self) -> Option<PathBuf> {
-        if self.0.run () == ResponseType::Ok.into () {
-            self.0.get_filename ()
+    pub fn run(&self) -> Option<PathBuf> {
+        if self.0.run() == ResponseType::Ok.into() {
+            self.0.get_filename()
         } else {
             None
         }
@@ -78,9 +78,13 @@ impl SaveDialog {
 }
 
 impl Drop for OpenDialog {
-    fn drop (&mut self) { self.0.destroy (); }
+    fn drop(&mut self) {
+        self.0.destroy();
+    }
 }
 
 impl Drop for SaveDialog {
-    fn drop (&mut self) { self.0.destroy (); }
+    fn drop(&mut self) {
+        self.0.destroy();
+    }
 }

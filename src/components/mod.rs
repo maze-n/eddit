@@ -18,13 +18,15 @@
  */
 
 mod app;
-mod header;
 mod content;
 mod dialog;
-pub mod misc;
 pub mod file_operations;
+mod header;
+pub mod misc;
+mod searchbox;
 
 pub use self::app::App;
-pub use self::header::Header;
 pub use self::content::Content;
 pub use self::dialog::{OpenDialog, SaveDialog};
+pub use self::header::Header;
+pub use self::searchbox::SearchBox;

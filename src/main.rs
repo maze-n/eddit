@@ -17,13 +17,11 @@
  * Authored by: mazen <https://github.com/maze-n>
  */
 
-pub mod state;
 pub mod components;
+pub mod state;
 
 use components::App;
 
 fn main() {
-    App::new ()
-        .connect_events ()
-        .execute ();
+    App::new().connect_events().execute();
 }
