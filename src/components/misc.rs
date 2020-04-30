@@ -45,3 +45,31 @@ pub fn before_quit(window: &Window) {
     settings.set_int("window-width", size.0);
     settings.set_int("window-height", size.1);
 }
+
+pub fn set_sensitivity (entry: &SearchEntry, up: &Button, down: &Button, text: &str, iter: &TextIter) {
+    let search_flag = TextSearchFlags::CASE_INSENSITIVE;
+    if text != "" {
+        if let Some(_) = iter.forward_search(text, search_flag, None) {
+            down.set_sensitive(true);
+        } else {
+            down.set_sensitive(false);
+        }
+    
+        if let Some(_) = iter.backward_search(text, search_flag, None) {
+            up.set_sensitive(true);
+        } else {
+            up.set_sensitive(false);
+        }
+    } else {
+        up.set_sensitive(false);
+        down.set_sensitive(false);
+    }
+
+    if !up.get_sensitive() && !down.get_sensitive() && text != "" {
+        entry.get_style_context().add_class(&gtk::STYLE_CLASS_ERROR);
+        entry.set_icon_from_icon_name(EntryIconPosition::Primary, Some("dialog-error-symbolic"));
+    } else {
+        entry.get_style_context().remove_class(&gtk::STYLE_CLASS_ERROR);
+        entry.set_icon_from_icon_name(EntryIconPosition::Primary, Some("edit-find-symbolic"));
+    }
+}

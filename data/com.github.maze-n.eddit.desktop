@@ -9,3 +9,9 @@ MimeType=text/plain
 Exec=com.github.maze-n.eddit %u
 Terminal=false
 Type=Application
+Actions=new-empty-window;
+
+[Desktop Action new-empty-window]
+Name=New Empty Window
+Exec=com.github.maze-n.eddit
+Icon=/usr/share/icons/hicolor/scalable/apps/com.github.maze-n.eddit.svg

@@ -1,7 +1,11 @@
 [package]
 name = "eddit"
-version = "0.1.0"
+version = "0.1.1"
 authors = ["maze-n <mmaz999@outlook.com>"]
+description = "A simple and basic text editor with GTK"
+license-file = "COPYING"
+license = "GPL-3.0"
+readme = "README.MD"
 edition = "2018"
 
 [dependencies]
@@ -21,3 +25,19 @@ version = "0.8.1"
 [dependencies.gio]
 version = "0.8.1"
 features = ["v2_44"]
+
+[package.metadata.deb]
+name = "com.github.maze-n.eddit"
+maintainer = "Mazen Maliyakkal <mmaz999@outlook.com>"
+copyright = "2020, Mazen Maliyakkal <mmaz999@outlook.com>"
+license-file = ["COPYING"]
+depends = "$auto"
+section = "utility"
+priority = "optional"
+maintainer-scripts = "make/post_install.py"
+assets = [
+    ["target/release/eddit", "/usr/bin/com.github.maze-n.eddit", "755"],
+    ["data/com.github.maze-n.eddit.desktop", "/usr/share/applications/", "644"],
+    ["data/com.github.maze-n.eddit.gschema.xml", "/usr/share/glib-2.0/schemas/", "644"],
+    ["res/icon/com.github.maze-n.eddit.svg", "/usr/share/icons/hicolor/scalable/apps/", "644"]
+]

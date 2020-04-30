@@ -109,22 +109,13 @@ impl App {
             self.open_file(current_file.clone());
             self.save_file(&save.clone(), &save, current_file.clone());
             self.font_changed(&self.header.font_button);
-            self.find_replace(
-                &self.header.find_button,
-                &self.revealer,
-                &self.search_bar.search_entry,
-            );
+            self.find_replace(&self.header.find_button, &self.revealer, &self.search_bar.search_entry);
             self.key_events(current_file);
         }
         ConnectedApp(self)
     }
 
-    pub fn find_replace(
-        &self,
-        find_button: &ToggleButton,
-        revealer: &Revealer,
-        search_entry: &SearchEntry,
-    ) {
+    pub fn find_replace(&self, find_button: &ToggleButton, revealer: &Revealer, search_entry: &SearchEntry) {
         let revealer = revealer.clone();
         //let case_sens_button = self.search_bar.case_sens_button.clone ();
         let search_entry = search_entry.clone();
@@ -155,80 +146,103 @@ impl App {
         //    search_settings_clone.set_case_sensitive (case_sens_clone.get_active ());
         //});
 
-        let entry = search_entry.clone();
+        let up_clone = up.clone();
+        let down_clone = down.clone();
         let search_settings_clone = search_settings.clone();
-        entry.connect_search_changed(move |entry| {
+        let buffer = buff.clone();
+        let search_entry_clone = search_entry.clone();
+        search_entry_clone.connect_search_changed(move |entry| {
+            let iter = buffer.get_iter_at_offset(buffer.get_property_cursor_position());
             if let Some(text) = entry.get_text() {
-                search_settings_clone.set_search_text(Some(text.as_str()));
+                let text = text.as_str();
+                search_settings_clone.set_search_text(Some(text));
+                set_sensitivity(&entry, &up_clone, &down_clone, text, &iter);
             }
         });
 
+        let up_clone = up.clone();
+        let down_clone = down.clone();
         let buffer = buff.clone();
         let search_settings_clone = search_settings.clone();
         let view_clone = view.clone();
-        down.connect_clicked(move |_| {
+        let search_entry_clone = search_entry.clone();
+        down.connect_clicked(move |down| {
             if let Some(iters) = buffer.get_selection_bounds() {
-                let iter = iters.1;
+                let mut iter = iters.1;
                 if let Some(search_string) = search_settings_clone.get_search_text() {
-                    if let Some(mut match_iters) =
-                        iter.forward_search(search_string.as_str(), search_flag, None)
-                    {
+                    if let Some(mut match_iters) = iter.forward_search(search_string.as_str(), search_flag, None) {
                         buffer.select_range(&match_iters.0, &match_iters.1);
                         view_clone.scroll_to_iter(&mut match_iters.0, 0.0, false, 0.0, 0.0);
+                        iter = match_iters.1;
                     }
+                    set_sensitivity(&search_entry_clone, &up_clone, &down, search_string.as_str(), &iter);
                 }
             } else {
-                let iter = buffer.get_iter_at_offset(buffer.get_property_cursor_position());
+                let mut iter = buffer.get_iter_at_offset(buffer.get_property_cursor_position());
                 if let Some(search_string) = search_settings_clone.get_search_text() {
-                    if let Some(mut match_iters) =
-                        iter.forward_search(search_string.as_str(), search_flag, None)
-                    {
+                    if let Some(mut match_iters) = iter.forward_search(search_string.as_str(), search_flag, None) {
                         buffer.select_range(&match_iters.0, &match_iters.1);
                         view_clone.scroll_to_iter(&mut match_iters.0, 0.0, false, 0.0, 0.0);
+                        iter = match_iters.1;
                     }
+                    set_sensitivity(&search_entry_clone, &up_clone, &down, search_string.as_str(), &iter);
                 }
             }
         });
 
         let buffer = buff.clone();
-        up.connect_clicked(move |_| {
+        up.connect_clicked(move |up| {
             if let Some(iters) = buffer.get_selection_bounds() {
-                let iter = iters.0;
+                let mut iter = iters.0;
                 if let Some(search_string) = search_settings.get_search_text() {
-                    if let Some(mut match_iters) = iter.backward_search(
-                        search_string.as_str(),
-                        TextSearchFlags::CASE_INSENSITIVE,
-                        None,
-                    ) {
+                    if let Some(mut match_iters) = iter.backward_search(search_string.as_str(), search_flag, None) {
                         buffer.select_range(&match_iters.0, &match_iters.1);
                         view.scroll_to_iter(&mut match_iters.0, 0.0, false, 0.0, 0.0);
+                        iter = match_iters.0;
                     }
+                    set_sensitivity(&search_entry, &up, &down_clone, search_string.as_str(), &iter);
                 }
             } else {
-                let iter = buffer.get_iter_at_offset(buffer.get_property_cursor_position());
+                let mut iter = buffer.get_iter_at_offset(buffer.get_property_cursor_position());
                 if let Some(search_string) = search_settings.get_search_text() {
-                    if let Some(mut match_iters) = iter.backward_search(
-                        search_string.as_str(),
-                        TextSearchFlags::CASE_INSENSITIVE,
-                        None,
-                    ) {
+                    if let Some(mut match_iters) = iter.backward_search(search_string.as_str(), search_flag, None) {
                         buffer.select_range(&match_iters.0, &match_iters.1);
                         view.scroll_to_iter(&mut match_iters.0, 0.0, false, 0.0, 0.0);
+                        iter = match_iters.0
                     }
+                    set_sensitivity(&search_entry, &up, &down_clone, search_string.as_str(), &iter);
+                }
+            }
+        });
+
+        let replace_clone = replace_button.clone();
+        let replace_all_clone = replace_all.clone();
+        let buffer = buff.clone();
+        replace_entry.connect_changed(move |replace_entry| {
+            if let Some(text) = replace_entry.get_text() {
+                if text.as_str() != "" {
+                    if let Some(_) = buffer.get_selection_bounds() {
+                        replace_clone.set_sensitive(true);
+                        replace_all_clone.set_sensitive(true);
+                    } else {
+                        replace_clone.set_sensitive(false);
+                        replace_all_clone.set_sensitive(false);
+                    }
+                } else {
+                    replace_clone.set_sensitive(false);
+                    replace_all_clone.set_sensitive(false);
                 }
             }
         });
 
         let search_context_clone = search_context.clone();
         let replace_entry_clone = replace_entry.clone();
+        let down_clone = down.clone();
         replace_button.connect_clicked(move |_| {
             if let Some(match_selected) = buff.get_selection_bounds() {
                 if let Some(replace_text) = replace_entry_clone.get_text() {
-                    search_context_clone.replace(
-                        &match_selected.0,
-                        &match_selected.1,
-                        replace_text.as_str(),
-                    );
+                    search_context_clone.replace(&match_selected.0, &match_selected.1, replace_text.as_str());
+                    down_clone.clicked();
                 }
             }
         });
@@ -255,11 +269,7 @@ impl App {
         });
     }
 
-    pub fn editor_changed(
-        &self,
-        current_file: Arc<RwLock<Option<ActiveMetadata>>>,
-        save_button: &Button,
-    ) {
+    pub fn editor_changed(&self, current_file: Arc<RwLock<Option<ActiveMetadata>>>, save_button: &Button) {
         let save_button = save_button.clone();
         self.content.buff.connect_changed(move |editor| {
             if let Some(text) = get_buffer(&editor) {

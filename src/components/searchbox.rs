@@ -45,8 +45,10 @@ impl SearchBox {
         search_entry.set_placeholder_text(Some("Find"));
         let up = Button::new_from_icon_name(Some("go-up-symbolic"), IconSize::SmallToolbar);
         up.set_tooltip_text(Some("Previous Item"));
+        up.set_sensitive(false);
         let down = Button::new_from_icon_name(Some("go-down-symbolic"), IconSize::SmallToolbar);
         down.set_tooltip_text(Some("Next Item"));
+        down.set_sensitive(false);
         //let case_sens_button = ToggleButton::new ();
         //case_sens_button.set_image (Some (&Image::new_from_icon_name (Some ("font-x-generic-symbolic"), IconSize::SmallToolbar)));
         //case_sens_button.set_tooltip_text (Some ("Set case sensitive searching"));
@@ -66,6 +68,8 @@ impl SearchBox {
         replace_entry.set_placeholder_text(Some("Replace With"));
         let replace_button = Button::new_with_label("Replace");
         let replace_all_button = Button::new_with_label("Replace All");
+        replace_button.set_sensitive(false);
+        replace_all_button.set_sensitive(false);
 
         replace_grid.add(&replace_entry);
         replace_grid.add(&replace_button);
