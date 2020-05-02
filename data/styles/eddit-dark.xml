@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ Forked from solarized-dark
+ This file is part of Eddit
+
+  Copyright (C) 2020 Mazen Maliyakkal <mmaz999@outlook.com>
+                                                                      
+  This program is free software: you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation, either version 3 of the License, or
+  (at your option) any later version.
+                                                                      
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+                                                                      
+  You should have received a copy of the GNU General Public License
+  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+-->
+<style-scheme id="eddit-dark" _name="Eddit-Dark" version="1.0">
+  <author>Mazen Maliyakkal</author>
+  <_description>Dark color scheme for Eddit</_description>
+
+  <!-- Solarized Palette -->
+  <color name="base03"  value="#002B36"/>
+  <color name="base02"  value="#073642"/>
+  <color name="base01"  value="#586E75"/>
+  <color name="base00"  value="#657B83"/>
+  <color name="base0"   value="#839496"/>
+  <color name="base1"   value="#93A1A1"/>
+  <color name="base2"   value="#EEE8D5"/>
+  <color name="base3"   value="#FDF6E3"/>
+  <color name="base4"   value="#436069"/>
+  <color name="yellow"  value="#B58900"/>
+  <color name="orange"  value="#CB4B16"/>
+  <color name="red"     value="#DC322F"/>
+  <color name="magenta" value="#D33682"/>
+  <color name="violet"  value="#6C71C4"/>
+  <color name="blue"    value="#268BD2"/>
+  <color name="cyan"    value="#2AA198"/>
+  <color name="green"   value="#859900"/>
+
+  <color name="base03-02-blend" value="#032F3B"/>
+
+  <!-- Global Settings -->
+  <style name="text"                        foreground="base1" background="base03"/>
+  <style name="selection"                   foreground="base03" background="base00"/>
+  <style name="cursor"                      foreground="base1"/>
+  <style name="secondary-cursor"            foreground="base00"/>
+  <style name="current-line"                background="base02"/>
+  <style name="line-numbers"                foreground="base01" background="base02"/>
+  <style name="background-pattern"          background="base03-02-blend"/>
+  <style name="draw-spaces"                 foreground="base4"/>
+
+  <!-- Search Matching -->
+  <style name="search-match"                foreground="base03" background="yellow"/>
+
+  -->
+</style-scheme>

@@ -1,6 +1,6 @@
 [package]
 name = "eddit"
-version = "0.1.1"
+version = "0.1.5"
 authors = ["maze-n <mmaz999@outlook.com>"]
 description = "A simple and basic text editor with GTK"
 license-file = "COPYING"
@@ -39,5 +39,7 @@ assets = [
     ["target/release/eddit", "/usr/bin/com.github.maze-n.eddit", "755"],
     ["data/com.github.maze-n.eddit.desktop", "/usr/share/applications/", "644"],
     ["data/com.github.maze-n.eddit.gschema.xml", "/usr/share/glib-2.0/schemas/", "644"],
-    ["res/icon/com.github.maze-n.eddit.svg", "/usr/share/icons/hicolor/scalable/apps/", "644"]
+    ["res/icon/com.github.maze-n.eddit.svg", "/usr/share/icons/hicolor/scalable/apps/", "644"],
+    ["data/styles/eddit-light.xml", "/usr/share/gtksourceview-3.0/styles/", "644"],
+    ["data/styles/eddit-dark.xml", "/usr/share/gtksourceview-3.0/styles/", "644"],
 ]

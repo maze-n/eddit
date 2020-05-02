@@ -28,6 +28,7 @@ pub struct Content {
     pub buff: Buffer,
     pub search_settings: SearchSettings,
     pub search_context: SearchContext,
+    pub style_manager: StyleSchemeManager,
 }
 
 impl Content {
@@ -37,12 +38,28 @@ impl Content {
         let view = View::new_with_buffer(&buff);
         let search_settings = SearchSettings::new();
         let search_context = SearchContext::new(&buff, Some(&search_settings));
+        let style_manager = StyleSchemeManager::new ();
+
         buff.place_cursor(&buff.get_start_iter());
         buff.set_highlight_matching_brackets(false);
 
         let settings = gio::Settings::new("com.github.maze-n.eddit");
         if let Some(font) = settings.get_string("font") {
             config_sourceview(&view, font.as_str().to_string());
+        }
+        if let Some(gtk_settings) = Settings::get_default() {
+            let is_dark = settings.get_boolean("is-dark");
+            if is_dark {
+                style_manager
+                    .get_scheme ("eddit-dark")
+                    .or (style_manager.get_scheme ("Classic"))
+                    .map (|theme| buff.set_style_scheme (Some(&theme)));
+            } else {
+                style_manager
+                    .get_scheme ("eddit-light")
+                    .or (style_manager.get_scheme ("Classic"))
+                    .map (|theme| buff.set_style_scheme (Some(&theme)));
+            }
         }
 
         container.add(&view);
@@ -53,6 +70,7 @@ impl Content {
             view,
             search_settings,
             search_context,
+            style_manager,
         }
     }
 }

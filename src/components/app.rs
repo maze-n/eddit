@@ -115,7 +115,80 @@ impl App {
         ConnectedApp(self)
     }
 
-    pub fn find_replace(&self, find_button: &ToggleButton, revealer: &Revealer, search_entry: &SearchEntry) {
+    fn theme_changed(&self, theme_switch: &Switch) {
+        let settings = gio::Settings::new("com.github.maze-n.eddit");
+        let source_style_manager = self.content.style_manager.clone();
+        let buff = self.content.buff.clone();
+
+        if let Some(gtk_settings) = Settings::get_default() {
+            theme_switch.set_state(gtk_settings.get_property_gtk_application_prefer_dark_theme());
+        }
+        theme_switch.connect_state_set(move |theme_switch, _| {
+            if let Some(gtk_settings) = Settings::get_default() {
+                gtk_settings
+                    .set_property_gtk_application_prefer_dark_theme(!theme_switch.get_state());
+                settings.set_boolean("is-dark", !theme_switch.get_state());
+                if !theme_switch.get_state() {
+                    source_style_manager
+                        .get_scheme ("eddit-dark")
+                        .or (source_style_manager.get_scheme ("Classic"))
+                        .map (|theme| buff.set_style_scheme (Some(&theme)));
+                } else {
+                    source_style_manager
+                        .get_scheme ("eddit-light")
+                        .or (source_style_manager.get_scheme ("Classic"))
+                        .map (|theme| buff.set_style_scheme (Some(&theme)));
+                }
+            }
+            Inhibit(false)
+        });
+    }
+
+    fn editor_changed(&self, current_file: Arc<RwLock<Option<ActiveMetadata>>>, save_button: &Button) {
+        let save_button = save_button.clone();
+        self.content.buff.connect_changed(move |editor| {
+            if let Some(text) = get_buffer(&editor) {
+                if let Some(ref current_file) = *current_file.read().unwrap() {
+                    let has_same_sum = current_file.is_same_as(&text.as_bytes());
+                    save_button.set_sensitive(!has_same_sum);
+                }
+            }
+        });
+    }
+
+    fn open_file(&self, current_file: Arc<RwLock<Option<ActiveMetadata>>>) {
+        let editor = self.content.buff.clone();
+        let headerbar = self.header.container.clone();
+        let args: Vec<String> = env::args().collect();
+        if args.len() > 1 {
+            open_from_files(&editor, &headerbar, &current_file, args[1].clone());
+        }
+
+        self.header
+            .open
+            .connect_clicked(move |_| open(&editor, &headerbar, &current_file));
+    }
+
+    fn save_file(&self,save_button: &Button, actual_button: &Button, current_file: Arc<RwLock<Option<ActiveMetadata>>>) {
+        let editor = self.content.buff.clone();
+        let headerbar = self.header.container.clone();
+        let save_button = save_button.clone();
+        actual_button.connect_clicked(move |_| save(&editor, &headerbar, &save_button, &current_file));
+    }
+
+    fn font_changed(&self, actual_button: &FontButton) {
+        let view = self.content.view.clone();
+        let font_button = actual_button.clone();
+        let settings = gio::Settings::new("com.github.maze-n.eddit");
+        actual_button.connect_font_set(move |_| {
+            if let Some(fontname) = font_button.get_font_name() {
+                WidgetExt::override_font(&view, &FontDescription::from_string(fontname.as_str()));
+                settings.set_string("font", fontname.as_str());
+            }
+        });
+    }
+
+    fn find_replace(&self, find_button: &ToggleButton, revealer: &Revealer, search_entry: &SearchEntry) {
         let revealer = revealer.clone();
         //let case_sens_button = self.search_bar.case_sens_button.clone ();
         let search_entry = search_entry.clone();
@@ -254,71 +327,6 @@ impl App {
         });
     }
 
-    pub fn theme_changed(&self, theme_switch: &Switch) {
-        let settings = gio::Settings::new("com.github.maze-n.eddit");
-        if let Some(gtk_settings) = Settings::get_default() {
-            theme_switch.set_state(gtk_settings.get_property_gtk_application_prefer_dark_theme());
-        }
-        theme_switch.connect_state_set(move |theme_switch, _| {
-            if let Some(gtk_settings) = Settings::get_default() {
-                gtk_settings
-                    .set_property_gtk_application_prefer_dark_theme(!theme_switch.get_state());
-                settings.set_boolean("is-dark", !theme_switch.get_state());
-            }
-            Inhibit(false)
-        });
-    }
-
-    pub fn editor_changed(&self, current_file: Arc<RwLock<Option<ActiveMetadata>>>, save_button: &Button) {
-        let save_button = save_button.clone();
-        self.content.buff.connect_changed(move |editor| {
-            if let Some(text) = get_buffer(&editor) {
-                if let Some(ref current_file) = *current_file.read().unwrap() {
-                    let has_same_sum = current_file.is_same_as(&text.as_bytes());
-                    save_button.set_sensitive(!has_same_sum);
-                }
-            }
-        });
-    }
-
-    fn open_file(&self, current_file: Arc<RwLock<Option<ActiveMetadata>>>) {
-        let editor = self.content.buff.clone();
-        let headerbar = self.header.container.clone();
-        let args: Vec<String> = env::args().collect();
-        if args.len() > 1 {
-            open_from_files(&editor, &headerbar, &current_file, args[1].clone());
-        }
-
-        self.header
-            .open
-            .connect_clicked(move |_| open(&editor, &headerbar, &current_file));
-    }
-
-    fn save_file(
-        &self,
-        save_button: &Button,
-        actual_button: &Button,
-        current_file: Arc<RwLock<Option<ActiveMetadata>>>,
-    ) {
-        let editor = self.content.buff.clone();
-        let headerbar = self.header.container.clone();
-        let save_button = save_button.clone();
-        actual_button
-            .connect_clicked(move |_| save(&editor, &headerbar, &save_button, &current_file));
-    }
-
-    fn font_changed(&self, actual_button: &FontButton) {
-        let view = self.content.view.clone();
-        let font_button = actual_button.clone();
-        let settings = gio::Settings::new("com.github.maze-n.eddit");
-        actual_button.connect_font_set(move |_| {
-            if let Some(fontname) = font_button.get_font_name() {
-                WidgetExt::override_font(&view, &FontDescription::from_string(fontname.as_str()));
-                settings.set_string("font", fontname.as_str());
-            }
-        });
-    }
-
     fn key_events(&self, current_file: Arc<RwLock<Option<ActiveMetadata>>>) {
         let editor = self.content.buff.clone();
         let headerbar = self.header.container.clone();
@@ -342,7 +350,6 @@ impl App {
                     && gdk.get_state().contains(gdk::ModifierType::CONTROL_MASK) =>
                 {
                     find_button.set_active(true);
-                    search_entry.grab_focus();
                 }
                 key if key == gdk::enums::key::Escape => {
                     find_button.set_active(false);
