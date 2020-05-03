@@ -19,7 +19,7 @@
 
 use super::file_operations::*;
 use super::misc::*;
-use super::{Content, Header, SearchBox};
+use super::{Content, Header, SearchBox, UnsavedDialog};
 use crate::state::ActiveMetadata;
 use gio::SettingsExt;
 use gtk::SettingsExt as GTKSettingsExt;
@@ -83,14 +83,6 @@ impl App {
         window.set_default_size(800, 600);
         window.add(&window_box);
 
-        let cloned_window = window.clone();
-
-        window.connect_delete_event(move |_, _| {
-            before_quit(&cloned_window);
-            main_quit();
-            Inhibit(false)
-        });
-
         App {
             window,
             header,
@@ -104,6 +96,7 @@ impl App {
         let current_file = Arc::new(RwLock::new(None));
         {
             let save = &self.header.save;
+            self.window_quit(&self.window, current_file.clone());
             self.theme_changed(&self.header.theme_switch);
             self.editor_changed(current_file.clone(), &self.header.save.clone());
             self.open_file(current_file.clone());
@@ -113,6 +106,37 @@ impl App {
             self.key_events(current_file);
         }
         ConnectedApp(self)
+    }
+
+    fn window_quit(&self, window: &Window, current_file: Arc<RwLock<Option<ActiveMetadata>>>) {
+        let window_clone = window.clone();
+        let save_button = self.header.save.clone();
+        let editor = self.content.buff.clone();
+        let headerbar = self.header.container.clone();
+
+        window.connect_delete_event(move |window, _| {
+            before_quit(&window_clone);
+            if save_button.get_sensitive() {
+                let dialog = UnsavedDialog::new(&window);
+                let result = dialog.run();
+                if result == ResponseType::Yes.into() {
+                    if save_before_close(&editor, &headerbar, &save_button, &current_file) {
+                        main_quit();
+                        Inhibit(false)
+                    } else {
+                        Inhibit(true)
+                    }
+                } else if result == ResponseType::No.into() {
+                    main_quit();
+                    Inhibit(false)
+                } else {
+                    Inhibit(true)
+                }
+            } else {
+                main_quit();
+                Inhibit(false)
+            }
+        });
     }
 
     fn theme_changed(&self, theme_switch: &Switch) {
@@ -190,7 +214,6 @@ impl App {
 
     fn find_replace(&self, find_button: &ToggleButton, revealer: &Revealer, search_entry: &SearchEntry) {
         let revealer = revealer.clone();
-        //let case_sens_button = self.search_bar.case_sens_button.clone ();
         let search_entry = search_entry.clone();
         let up = self.search_bar.up.clone();
         let down = self.search_bar.down.clone();
@@ -211,13 +234,6 @@ impl App {
             entry.grab_focus();
             search_settings_clone.set_search_text(Some(""));
         });
-
-        //let search_settings_clone = search_settings.clone ();
-        //let case_sens_clone = case_sens_button.clone ();
-        //let search_flag_clone = search_flag.clone ();
-        //case_sens_clone.connect_toggled (move |case_sens_clone| {
-        //    search_settings_clone.set_case_sensitive (case_sens_clone.get_active ());
-        //});
 
         let up_clone = up.clone();
         let down_clone = down.clone();
@@ -332,7 +348,6 @@ impl App {
         let headerbar = self.header.container.clone();
         let save_button = self.header.save.clone();
         let find_button = self.header.find_button.clone();
-        let search_entry = self.search_bar.search_entry.clone();
 
         self.window.connect_key_press_event(move |_, gdk| {
             match gdk.get_keyval() {

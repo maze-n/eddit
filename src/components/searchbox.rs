@@ -27,7 +27,6 @@ pub struct SearchBox {
     pub replace_all_button: Button,
     pub up: Button,
     pub down: Button,
-    //pub case_sens_button: ToggleButton,
 }
 
 impl SearchBox {
@@ -49,11 +48,7 @@ impl SearchBox {
         let down = Button::new_from_icon_name(Some("go-down-symbolic"), IconSize::SmallToolbar);
         down.set_tooltip_text(Some("Next Item"));
         down.set_sensitive(false);
-        //let case_sens_button = ToggleButton::new ();
-        //case_sens_button.set_image (Some (&Image::new_from_icon_name (Some ("font-x-generic-symbolic"), IconSize::SmallToolbar)));
-        //case_sens_button.set_tooltip_text (Some ("Set case sensitive searching"));
 
-        //search_grid.add (&case_sens_button);
         search_grid.add(&search_entry);
         search_grid.add(&down);
         search_grid.add(&up);
@@ -86,7 +81,6 @@ impl SearchBox {
             replace_all_button,
             up,
             down,
-            //case_sens_button,
         }
     }
 }

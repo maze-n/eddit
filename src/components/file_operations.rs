@@ -94,6 +94,45 @@ fn write_data(path: Option<&ActiveMetadata>, data: &[u8]) -> io::Result<SaveActi
     }
 }
 
+pub fn save_before_close(
+    editor: &Buffer,
+    headerbar: &HeaderBar,
+    save: &Button,
+    current_file: &RwLock<Option<ActiveMetadata>>,
+) -> bool
+{
+    let mut is_saved = false;
+    if let Some(text) = get_buffer(editor) {
+        let result = write_data(current_file.read().unwrap().as_ref(), text.as_bytes());
+
+        match result {
+            Ok(SaveAction::New(file)) => {
+                set_title(headerbar, file.get_path());
+                if let Some(parent) = file.get_dir() {
+                    let subtitle: &str = &parent.to_string_lossy();
+                    headerbar.set_subtitle(Some(subtitle));
+                }
+
+                let mut current_file = current_file.write().unwrap();
+                *current_file = Some(file);
+                save.set_sensitive(false);
+                is_saved = true;
+            }
+
+            Ok(SaveAction::Saved) => {
+                if let Some(ref mut current_file) = *current_file.write().unwrap() {
+                    current_file.set_sum(&text.as_bytes());
+                    save.set_sensitive(false);
+                }
+                is_saved = true;
+            }
+
+            _ => (),
+        }
+    }
+    is_saved
+}
+
 pub fn open(editor: &Buffer, headerbar: &HeaderBar, current_file: &RwLock<Option<ActiveMetadata>>) {
     let open_dialog = OpenDialog::new({
         let lock = current_file.read().unwrap();

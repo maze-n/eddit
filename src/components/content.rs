@@ -47,7 +47,7 @@ impl Content {
         if let Some(font) = settings.get_string("font") {
             config_sourceview(&view, font.as_str().to_string());
         }
-        if let Some(gtk_settings) = Settings::get_default() {
+        if let Some(_) = Settings::get_default() {
             let is_dark = settings.get_boolean("is-dark");
             if is_dark {
                 style_manager

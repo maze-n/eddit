@@ -24,6 +24,8 @@ pub struct OpenDialog(FileChooserDialog);
 
 pub struct SaveDialog(FileChooserDialog);
 
+pub struct UnsavedDialog(Dialog);
+
 impl OpenDialog {
     pub fn new(path: Option<PathBuf>) -> OpenDialog {
         let open_dialog = FileChooserDialog::new(
@@ -77,6 +79,53 @@ impl SaveDialog {
     }
 }
 
+impl UnsavedDialog {
+    pub fn new(window: &Window) -> UnsavedDialog {
+        let unsaved_dialog = Dialog::new_with_buttons(
+            Some("Warning"),
+            Some(window),
+            DialogFlags::DESTROY_WITH_PARENT,
+            &[],
+        );
+
+        let dialog_box = unsaved_dialog.get_content_area();
+        
+        let dialog_grid = Box::new(Orientation::Horizontal, 20);
+        dialog_grid.set_border_width(20);
+
+        let warning_image = Image::new_from_icon_name(Some("dialog-warning"), IconSize::Dialog);
+        let head_label = Label::new(Some("Save the file before closing?"));
+        head_label.set_markup("<big><b>Save the file before closing?</b></big>");
+        let sub_label = Label::new(Some("Your changes will be lost if you don't save them."));
+
+        let label_box = Box::new(Orientation::Vertical, 4);
+        label_box.add(&head_label);
+        label_box.add(&sub_label);
+
+        dialog_grid.add(&warning_image);
+        dialog_grid.add(&label_box);
+
+        dialog_box.add(&dialog_grid);
+
+        let save_button = Button::new_with_label("Save");
+        save_button.get_style_context().add_class("suggested-action");
+
+        let unsave_button = Button::new_with_label("Don't Save");
+
+        unsaved_dialog.add_action_widget(&unsave_button, ResponseType::No);
+        unsaved_dialog.add_action_widget(&save_button, ResponseType::Yes);
+
+        unsaved_dialog.set_resizable(false);
+        unsaved_dialog.show_all();
+
+        UnsavedDialog(unsaved_dialog)
+    }
+
+    pub fn run(&self) -> ResponseType {
+        self.0.run()
+    }
+}
+
 impl Drop for OpenDialog {
     fn drop(&mut self) {
         self.0.destroy();
@@ -84,6 +133,12 @@ impl Drop for OpenDialog {
 }
 
 impl Drop for SaveDialog {
+    fn drop(&mut self) {
+        self.0.destroy();
+    }
+}
+
+impl Drop for UnsavedDialog {
     fn drop(&mut self) {
         self.0.destroy();
     }
