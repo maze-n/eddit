@@ -38,6 +38,7 @@ pub enum SaveAction {
 pub fn save(
     editor: &Buffer,
     headerbar: &HeaderBar,
+    path_label: &Label,
     save: &Button,
     current_file: &RwLock<Option<ActiveMetadata>>,
 ) {
@@ -46,10 +47,9 @@ pub fn save(
 
         match result {
             Ok(SaveAction::New(file)) => {
-                set_title(headerbar, file.get_path());
-                if let Some(parent) = file.get_dir() {
-                    let subtitle: &str = &parent.to_string_lossy();
-                    headerbar.set_subtitle(Some(subtitle));
+                path_label.set_text(&file.get_path().to_string_lossy());
+                if let Some(filename) = file.get_path().file_name() {
+                    headerbar.set_subtitle(Some(&filename.to_string_lossy()));
                 }
 
                 let mut current_file = current_file.write().unwrap();
@@ -97,6 +97,7 @@ fn write_data(path: Option<&ActiveMetadata>, data: &[u8]) -> io::Result<SaveActi
 pub fn save_before_close(
     editor: &Buffer,
     headerbar: &HeaderBar,
+    path_label: &Label,
     save: &Button,
     current_file: &RwLock<Option<ActiveMetadata>>,
 ) -> bool
@@ -107,12 +108,6 @@ pub fn save_before_close(
 
         match result {
             Ok(SaveAction::New(file)) => {
-                set_title(headerbar, file.get_path());
-                if let Some(parent) = file.get_dir() {
-                    let subtitle: &str = &parent.to_string_lossy();
-                    headerbar.set_subtitle(Some(subtitle));
-                }
-
                 let mut current_file = current_file.write().unwrap();
                 *current_file = Some(file);
                 save.set_sensitive(false);
@@ -133,7 +128,7 @@ pub fn save_before_close(
     is_saved
 }
 
-pub fn open(editor: &Buffer, headerbar: &HeaderBar, current_file: &RwLock<Option<ActiveMetadata>>) {
+pub fn open(editor: &Buffer, headerbar: &HeaderBar, path_label: &Label, current_file: &RwLock<Option<ActiveMetadata>>) {
     let open_dialog = OpenDialog::new({
         let lock = current_file.read().unwrap();
         if let Some(ref path) = *lock {
@@ -148,10 +143,9 @@ pub fn open(editor: &Buffer, headerbar: &HeaderBar, current_file: &RwLock<Option
             let mut contents = String::new();
             let _ = file.read_to_string(&mut contents);
 
-            set_title(&headerbar, &new_file);
-            if let Some(parent) = new_file.parent() {
-                let subtitle: &str = &parent.to_string_lossy();
-                headerbar.set_subtitle(Some(subtitle));
+            path_label.set_text(&new_file.to_string_lossy());
+            if let Some(filename) = new_file.file_name() {
+                headerbar.set_subtitle(Some(&filename.to_string_lossy()));
             }
 
             *current_file.write().unwrap() =
@@ -165,6 +159,7 @@ pub fn open(editor: &Buffer, headerbar: &HeaderBar, current_file: &RwLock<Option
 pub fn open_from_files(
     editor: &Buffer,
     headerbar: &HeaderBar,
+    path_label: &Label,
     current_file: &RwLock<Option<ActiveMetadata>>,
     path: String,
 ) {
@@ -173,10 +168,9 @@ pub fn open_from_files(
         let mut contents = String::new();
         let _ = file.read_to_string(&mut contents);
 
-        set_title(&headerbar, &new_file);
-        if let Some(parent) = new_file.parent() {
-            let subtitle: &str = &parent.to_string_lossy();
-            headerbar.set_subtitle(Some(subtitle));
+        path_label.set_text(&new_file.to_string_lossy());
+        if let Some(filename) = new_file.file_name() {
+            headerbar.set_subtitle(Some(&filename.to_string_lossy()));
         }
 
         *current_file.write().unwrap() = Some(ActiveMetadata::new(new_file, &contents.as_bytes()));

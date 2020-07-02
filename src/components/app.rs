@@ -35,6 +35,7 @@ pub struct App {
     pub content: Content,
     pub search_bar: SearchBox,
     pub revealer: Revealer,
+    pub path_label: Label,
 }
 
 pub struct ConnectedApp(App);
@@ -57,6 +58,14 @@ impl App {
         revealer.set_transition_type(RevealerTransitionType::SlideDown);
         revealer.add(&search_bar.container);
 
+        let bottom_box = Box::new(Orientation::Horizontal, 0);
+        bottom_box.set_border_width(4);
+        let path_label = Label::new(Some("Unsaved file"));
+        path_label.set_selectable(true);
+        path_label.set_halign(Align::Start);
+
+        bottom_box.pack_start(&path_label, false, false, 0);
+
         let settings = gio::Settings::new("com.github.maze-n.eddit");
         let pos_x = settings.get_int("pos-x");
         let pos_y = settings.get_int("pos-y");
@@ -77,7 +86,9 @@ impl App {
 
         window_box.pack_start(&revealer, false, true, 0);
         window_box.pack_start(&content.container, true, true, 0);
+        window_box.pack_start(&bottom_box, false, false, 0);
 
+        window.get_style_context().add_class("rounded");
         window.set_titlebar(Some(&header.container));
         window.set_title("eddit");
         window.set_default_size(800, 600);
@@ -89,6 +100,7 @@ impl App {
             content,
             search_bar,
             revealer,
+            path_label,
         }
     }
 
@@ -113,6 +125,7 @@ impl App {
         let save_button = self.header.save.clone();
         let editor = self.content.buff.clone();
         let headerbar = self.header.container.clone();
+        let path_label = self.path_label.clone();
 
         window.connect_delete_event(move |window, _| {
             before_quit(&window_clone);
@@ -120,7 +133,7 @@ impl App {
                 let dialog = UnsavedDialog::new(&window);
                 let result = dialog.run();
                 if result == ResponseType::Yes.into() {
-                    if save_before_close(&editor, &headerbar, &save_button, &current_file) {
+                    if save_before_close(&editor, &headerbar, &path_label, &save_button, &current_file) {
                         main_quit();
                         Inhibit(false)
                     } else {
@@ -183,21 +196,23 @@ impl App {
     fn open_file(&self, current_file: Arc<RwLock<Option<ActiveMetadata>>>) {
         let editor = self.content.buff.clone();
         let headerbar = self.header.container.clone();
+        let path_label = self.path_label.clone();
         let args: Vec<String> = env::args().collect();
         if args.len() > 1 {
-            open_from_files(&editor, &headerbar, &current_file, args[1].clone());
+            open_from_files(&editor, &headerbar, &path_label, &current_file, args[1].clone());
         }
 
         self.header
             .open
-            .connect_clicked(move |_| open(&editor, &headerbar, &current_file));
+            .connect_clicked(move |_| open(&editor, &headerbar, &path_label, &current_file));
     }
 
     fn save_file(&self,save_button: &Button, actual_button: &Button, current_file: Arc<RwLock<Option<ActiveMetadata>>>) {
         let editor = self.content.buff.clone();
         let headerbar = self.header.container.clone();
         let save_button = save_button.clone();
-        actual_button.connect_clicked(move |_| save(&editor, &headerbar, &save_button, &current_file));
+        let path_label = self.path_label.clone();
+        actual_button.connect_clicked(move |_| save(&editor, &headerbar, &path_label, &save_button, &current_file));
     }
 
     fn font_changed(&self, actual_button: &FontButton) {
@@ -346,6 +361,7 @@ impl App {
     fn key_events(&self, current_file: Arc<RwLock<Option<ActiveMetadata>>>) {
         let editor = self.content.buff.clone();
         let headerbar = self.header.container.clone();
+        let path_label = self.path_label.clone();
         let save_button = self.header.save.clone();
         let find_button = self.header.find_button.clone();
 
@@ -354,12 +370,12 @@ impl App {
                 key if key == 's' as u32
                     && gdk.get_state().contains(gdk::ModifierType::CONTROL_MASK) =>
                 {
-                    save(&editor, &headerbar, &save_button, &current_file);
+                    save(&editor, &headerbar, &path_label, &save_button, &current_file);
                 }
                 key if key == 'o' as u32
                     && gdk.get_state().contains(gdk::ModifierType::CONTROL_MASK) =>
                 {
-                    open(&editor, &headerbar, &current_file);
+                    open(&editor, &headerbar, &path_label, &current_file);
                 }
                 key if key == 'f' as u32
                     && gdk.get_state().contains(gdk::ModifierType::CONTROL_MASK) =>

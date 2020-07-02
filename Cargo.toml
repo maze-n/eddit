@@ -1,6 +1,6 @@
 [package]
 name = "eddit"
-version = "0.1.5"
+version = "0.1.7"
 authors = ["maze-n <mmaz999@outlook.com>"]
 description = "A simple and basic text editor with GTK"
 license-file = "COPYING"
