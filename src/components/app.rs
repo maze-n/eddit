@@ -60,8 +60,10 @@ impl App {
 
         let bottom_box = Box::new(Orientation::Horizontal, 0);
         bottom_box.set_border_width(4);
+
         let path_label = Label::new(Some("Unsaved file"));
         path_label.set_selectable(true);
+        path_label.set_ellipsize(EllipsizeMode::Start);
         path_label.set_halign(Align::Start);
 
         bottom_box.pack_start(&path_label, false, false, 0);
@@ -69,6 +71,7 @@ impl App {
         let settings = gio::Settings::new("com.github.maze-n.eddit");
         let pos_x = settings.get_int("pos-x");
         let pos_y = settings.get_int("pos-y");
+        let is_maximized = settings.get_boolean("is-maximized");
         settings.set_int("pos-x", pos_x + 20);
         settings.set_int("pos-y", pos_y + 20);
         let window_width = settings.get_int("window-width");
@@ -79,6 +82,9 @@ impl App {
             window.move_(pos_x, pos_y);
         }
         window.resize(window_width, window_height);
+        if is_maximized {
+            window.maximize();
+        }
         if let Some(gtk_settings) = Settings::get_default() {
             let is_dark = settings.get_boolean("is-dark");
             gtk_settings.set_property_gtk_application_prefer_dark_theme(is_dark);
@@ -124,8 +130,7 @@ impl App {
         let window_clone = window.clone();
         let save_button = self.header.save.clone();
         let editor = self.content.buff.clone();
-        let headerbar = self.header.container.clone();
-        let path_label = self.path_label.clone();
+        let window = self.window.clone();
 
         window.connect_delete_event(move |window, _| {
             before_quit(&window_clone);
@@ -133,7 +138,7 @@ impl App {
                 let dialog = UnsavedDialog::new(&window);
                 let result = dialog.run();
                 if result == ResponseType::Yes.into() {
-                    if save_before_close(&editor, &headerbar, &path_label, &save_button, &current_file) {
+                    if save_before_close(&editor, &window, &save_button, &current_file) {
                         main_quit();
                         Inhibit(false)
                     } else {
@@ -162,8 +167,7 @@ impl App {
         }
         theme_switch.connect_state_set(move |theme_switch, _| {
             if let Some(gtk_settings) = Settings::get_default() {
-                gtk_settings
-                    .set_property_gtk_application_prefer_dark_theme(!theme_switch.get_state());
+                gtk_settings.set_property_gtk_application_prefer_dark_theme(!theme_switch.get_state());
                 settings.set_boolean("is-dark", !theme_switch.get_state());
                 if !theme_switch.get_state() {
                     source_style_manager
@@ -210,9 +214,10 @@ impl App {
     fn save_file(&self,save_button: &Button, actual_button: &Button, current_file: Arc<RwLock<Option<ActiveMetadata>>>) {
         let editor = self.content.buff.clone();
         let headerbar = self.header.container.clone();
+        let window = self.window.clone();
         let save_button = save_button.clone();
         let path_label = self.path_label.clone();
-        actual_button.connect_clicked(move |_| save(&editor, &headerbar, &path_label, &save_button, &current_file));
+        actual_button.connect_clicked(move |_| save(&editor, &headerbar, &window, &path_label, &save_button, &current_file));
     }
 
     fn font_changed(&self, actual_button: &FontButton) {
@@ -361,6 +366,7 @@ impl App {
     fn key_events(&self, current_file: Arc<RwLock<Option<ActiveMetadata>>>) {
         let editor = self.content.buff.clone();
         let headerbar = self.header.container.clone();
+        let window = self.window.clone();
         let path_label = self.path_label.clone();
         let save_button = self.header.save.clone();
         let find_button = self.header.find_button.clone();
@@ -370,7 +376,7 @@ impl App {
                 key if key == 's' as u32
                     && gdk.get_state().contains(gdk::ModifierType::CONTROL_MASK) =>
                 {
-                    save(&editor, &headerbar, &path_label, &save_button, &current_file);
+                    save(&editor, &headerbar, &window, &path_label, &save_button, &current_file);
                 }
                 key if key == 'o' as u32
                     && gdk.get_state().contains(gdk::ModifierType::CONTROL_MASK) =>

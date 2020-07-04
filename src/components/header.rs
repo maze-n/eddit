@@ -38,24 +38,20 @@ impl Header {
 
         let settings = gio::Settings::new("com.github.maze-n.eddit");
 
-        let open = Button::new_from_icon_name(Some("document-open"), IconSize::LargeToolbar);
+        let open = Button::new();
+        open.set_image(Some(&Image::new_from_file("/opt/com.github.maze-n.eddit/icons/document-open.svg")));
         open.set_tooltip_text(Some("Open a file\n   Ctrl + O"));
         open.set_valign(Align::Center);
-        let save = Button::new_from_icon_name(Some("document-save"), IconSize::LargeToolbar);
+        let save = Button::new();
+        save.set_image(Some(&Image::new_from_file("/opt/com.github.maze-n.eddit/icons/document-save.svg")));
         save.set_tooltip_text(Some("Save file\n Ctrl + S"));
         save.set_valign(Align::Center);
         let menu_button = MenuButton::new();
         menu_button.set_tooltip_text(Some("Preferences"));
         menu_button.set_valign(Align::Center);
-        menu_button.set_image(Some(&Image::new_from_icon_name(
-            Some("open-menu"),
-            IconSize::LargeToolbar,
-        )));
+        menu_button.set_image(Some(&Image::new_from_file("/opt/com.github.maze-n.eddit/icons/open-menu.svg")));
         let find_button = ToggleButton::new();
-        find_button.set_image(Some(&Image::new_from_icon_name(
-            Some("edit-find"),
-            IconSize::LargeToolbar,
-        )));
+        find_button.set_image(Some(&Image::new_from_file("/opt/com.github.maze-n.eddit/icons/find.svg")));
         find_button.set_valign(Align::Center);
         find_button.set_tooltip_text(Some("Find and replace\n         Ctrl + F"));
 
@@ -69,14 +65,12 @@ impl Header {
         theme_selector.set_column_spacing(12);
         theme_selector.set_hexpand(true);
 
-        let light_icon =
-            Image::new_from_icon_name(Some("brightness-display-symbolic"), IconSize::LargeToolbar);
+        let light_icon = Image::new_from_file("/opt/com.github.maze-n.eddit/icons/day.svg");
         light_icon.set_halign(Align::End);
-        let dark_icon =
-            Image::new_from_icon_name(Some("weather-clear-night-symbolic"), IconSize::LargeToolbar);
+        let dark_icon = Image::new_from_file("/opt/com.github.maze-n.eddit/icons/night.svg");
         dark_icon.set_halign(Align::Start);
         let theme_switch = Switch::new();
-        theme_switch.set_tooltip_text(Some("Toggle light/dark theme"));
+        theme_switch.set_tooltip_text(Some("Toggle editor theme"));
         theme_switch.set_halign(Align::Center);
 
         theme_selector.add(&light_icon);

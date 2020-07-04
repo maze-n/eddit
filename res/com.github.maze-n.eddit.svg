@@ -1,6 +1,4 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<!-- Created with Inkscape (http://www.inkscape.org/) -->
-
 <svg
    xmlns:dc="http://purl.org/dc/elements/1.1/"
    xmlns:cc="http://creativecommons.org/ns#"
@@ -16,7 +14,7 @@
    version="1.1"
    id="SVGRoot"
    sodipodi:docname="com.github.maze-n.eddit.svg"
-   inkscape:version="0.92.3 (2405546, 2018-03-11)">
+   inkscape:version="1.0 (1.0+r73+1)">
   <sodipodi:namedview
      id="base"
      pagecolor="#ffffff"
@@ -24,9 +22,9 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="11.313709"
-     inkscape:cx="9.196365"
-     inkscape:cy="28.506517"
+     inkscape:zoom="8.5342553"
+     inkscape:cx="7.899559"
+     inkscape:cy="42.959543"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="false"
@@ -35,7 +33,8 @@
      inkscape:window-x="0"
      inkscape:window-y="30"
      inkscape:window-maximized="1"
-     inkscape:grid-bbox="true" />
+     inkscape:grid-bbox="true"
+     inkscape:document-rotation="0" />
   <defs
      id="defs815">
     <linearGradient
@@ -70,7 +69,7 @@
        x2="-4.3185692"
        y2="-8.793107"
        gradientUnits="userSpaceOnUse"
-       gradientTransform="translate(-1.2464818,2.3243021)" />
+       gradientTransform="matrix(1.0719275,0,0,1.0719276,0.22535882,4.6100687)" />
   </defs>
   <metadata
      id="metadata818">
@@ -88,43 +87,43 @@
      inkscape:groupmode="layer"
      inkscape:label="Layer 1">
     <rect
-       style="fill:#005544;fill-opacity:1;stroke:none;stroke-width:0.98863471;stroke-opacity:1"
+       style="fill:#005544;fill-opacity:1;stroke:none;stroke-width:1.05974;stroke-opacity:1"
        id="rect1374-7"
-       width="30.726627"
-       height="40.124702"
-       x="-36.301628"
-       y="-46.501896"
-       ry="2.0934629"
+       width="32.936722"
+       height="43.010777"
+       x="-37.110924"
+       y="-47.954746"
+       ry="2.2440407"
        transform="matrix(-0.99999973,7.347608e-4,-0.0157783,-0.99987551,0,0)" />
     <rect
-       style="fill:#008066;fill-opacity:0.99024389;stroke:none;stroke-width:0.98863471;stroke-opacity:1"
+       style="fill:#008066;fill-opacity:0.990244;stroke:none;stroke-width:1.05974;stroke-opacity:1"
        id="rect1374"
-       width="30.726624"
-       height="40.124702"
-       x="-36.035797"
-       y="-46.548294"
-       ry="2.0934629"
+       width="32.936714"
+       height="43.010777"
+       x="-36.966717"
+       y="-47.879356"
+       ry="2.2440407"
        transform="matrix(-0.99742646,0.07169698,-0.08669377,-0.99623501,0,0)" />
     <rect
-       style="fill:url(#linearGradient2586);fill-opacity:1;stroke:none;stroke-width:0.98857886;stroke-opacity:1"
+       style="fill:url(#linearGradient2586);fill-opacity:1;stroke:none;stroke-width:1.05968;stroke-opacity:1"
        id="rect1374-3"
-       width="30.739227"
-       height="40.103722"
-       x="-36.304283"
-       y="-46.572521"
-       ry="2.0923681"
+       width="32.950226"
+       height="42.988285"
+       x="-37.354065"
+       y="-47.803783"
+       ry="2.242867"
        transform="matrix(-0.99099542,0.13389578,-0.13414931,-0.99096113,0,0)" />
     <text
        xml:space="preserve"
-       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:22.67381287px;line-height:1.25;font-family:'Khmer Busra';-inkscape-font-specification:'Khmer Busra, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:0.39215686;stroke:none;stroke-width:0.56708777"
-       x="6.9723587"
-       y="33.242085"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:24.3047px;line-height:1.25;font-family:'Khmer Busra';-inkscape-font-specification:'Khmer Busra, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:0.392157;stroke:none;stroke-width:0.607877"
+       x="5.9098687"
+       y="33.515965"
        id="text925"
        transform="rotate(-7.6418718)"><tspan
          sodipodi:role="line"
          id="tspan923"
-         x="6.9723587"
-         y="33.242085"
-         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:22.67381287px;font-family:'Khmer Busra';-inkscape-font-specification:'Khmer Busra, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:0.39215686;stroke-width:0.56708777">Aa</tspan></text>
+         x="5.9098687"
+         y="33.515965"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:24.3047px;font-family:'Khmer Busra';-inkscape-font-specification:'Khmer Busra, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:0.392157;stroke-width:0.607877">Aa</tspan></text>
   </g>
 </svg>

@@ -26,6 +26,8 @@ pub struct SaveDialog(FileChooserDialog);
 
 pub struct UnsavedDialog(Dialog);
 
+pub struct ErrorDialog(Dialog);
+
 impl OpenDialog {
     pub fn new(path: Option<PathBuf>) -> OpenDialog {
         let open_dialog = FileChooserDialog::new(
@@ -126,6 +128,43 @@ impl UnsavedDialog {
     }
 }
 
+impl ErrorDialog {
+    pub fn new(window: &Window) -> ErrorDialog {
+        let error_dialog = Dialog::new_with_buttons(
+            Some("Error"),
+            Some(window),
+            DialogFlags::DESTROY_WITH_PARENT,
+            &[("OK", ResponseType::Ok)],
+        );
+
+        let dialog_box = error_dialog.get_content_area();
+        
+        let dialog_grid = Box::new(Orientation::Horizontal, 20);
+        dialog_grid.set_border_width(20);
+
+        let error_image = Image::new_from_icon_name(Some("dialog-error"), IconSize::Dialog);
+        let head_label = Label::new(Some("Failed to save the file"));
+        head_label.set_markup("<big><b>Failed to save the file</b></big>");
+        let sub_label = Label::new(Some("The file may be read-only, or another user may have it open. Try saving the file\n with a different name or in a different folder."));
+        let label_box = Box::new(Orientation::Vertical, 4);
+        label_box.add(&head_label);
+        label_box.add(&sub_label);
+
+        dialog_grid.add(&error_image);
+        dialog_grid.add(&label_box);
+        dialog_box.add(&dialog_grid);
+
+        error_dialog.set_resizable(false);
+        error_dialog.show_all();
+
+        ErrorDialog(error_dialog)
+    }
+
+    pub fn run(&self) -> ResponseType {
+        self.0.run()
+    }
+}
+
 impl Drop for OpenDialog {
     fn drop(&mut self) {
         self.0.destroy();
@@ -139,6 +178,12 @@ impl Drop for SaveDialog {
 }
 
 impl Drop for UnsavedDialog {
+    fn drop(&mut self) {
+        self.0.destroy();
+    }
+}
+
+impl Drop for ErrorDialog {
     fn drop(&mut self) {
         self.0.destroy();
     }

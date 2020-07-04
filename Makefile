@@ -4,13 +4,20 @@ target/release/eddit : src
 	cargo build --release
 
 install : target/release/eddit
+	python make/pre_install.py
 	cp target/release/eddit /usr/bin/com.github.maze-n.eddit
 	cp data/com.github.maze-n.eddit.desktop /usr/share/applications/
 	cp data/com.github.maze-n.eddit.gschema.xml /usr/share/glib-2.0/schemas/
-	cp res/icon/com.github.maze-n.eddit.svg /usr/share/icons/hicolor/scalable/apps/
+	cp res/com.github.maze-n.eddit.svg /usr/share/icons/hicolor/scalable/apps/
 	cp data/styles/eddit-light.xml /usr/share/gtksourceview-3.0/styles/
 	cp data/styles/eddit-dark.xml /usr/share/gtksourceview-3.0/styles/
-	python3 make/post_install.py
+	cp res/icons/document-open.svg /opt/com.github.maze-n.eddit/icons/
+	cp res/icons/document-save.svg /opt/com.github.maze-n.eddit/icons/
+	cp res/icons/find.svg /opt/com.github.maze-n.eddit/icons/
+	cp res/icons/open-menu.svg /opt/com.github.maze-n.eddit/icons/
+	cp res/icons/day.svg /opt/com.github.maze-n.eddit/icons/
+	cp res/icons/night.svg /opt/com.github.maze-n.eddit/icons/
+	python make/post_install.py
 
 uninstall :
 	rm -f /usr/bin/com.github.maze-n.eddit
@@ -19,6 +26,7 @@ uninstall :
 	rm -f /usr/share/icons/hicolor/scalable/apps/com.github.maze-n.eddit.svg
 	rm -f /usr/share/gtksourceview-3.0/styles/eddit-light.xml
 	rm -f /usr/share/gtksourceview-3.0/styles/eddit-dark.xml
+	rm -rf /opt/com.github.maze-n.eddit
 
 clean-all : clean
 	cargo clean

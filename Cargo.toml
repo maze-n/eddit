@@ -13,6 +13,7 @@ gdk = "0.12.1"
 tiny-keccak = "1.4.0"
 pango = "0.8.0"
 glib = "0.9.3"
+faccess = "0.2.3"
 
 [dependencies.sourceview]
 features = ["v3_18"]

@@ -21,7 +21,6 @@ use gio::SettingsExt;
 use glib::GString;
 use gtk::*;
 use sourceview::*;
-use std::path::Path;
 
 pub fn get_buffer(buffer: &Buffer) -> Option<GString> {
     let (start, end) = buffer.get_bounds();
@@ -31,11 +30,13 @@ pub fn get_buffer(buffer: &Buffer) -> Option<GString> {
 pub fn before_quit(window: &Window) {
     let size = window.get_size();
     let position = window.get_position();
+    let is_maximized = window.get_property_is_maximized();
     let settings = gio::Settings::new("com.github.maze-n.eddit");
     settings.set_int("pos-x", position.0);
     settings.set_int("pos-y", position.1);
     settings.set_int("window-width", size.0);
     settings.set_int("window-height", size.1);
+    settings.set_boolean("is-maximized", is_maximized);
 }
 
 pub fn set_sensitivity (entry: &SearchEntry, up: &Button, down: &Button, text: &str, iter: &TextIter) {

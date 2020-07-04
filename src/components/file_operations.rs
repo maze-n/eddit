@@ -18,8 +18,7 @@
  */
 
 use super::misc::*;
-use super::OpenDialog;
-use super::SaveDialog;
+use super::{OpenDialog, SaveDialog, ErrorDialog};
 use crate::state::ActiveMetadata;
 use gtk::*;
 use sourceview::*;
@@ -28,6 +27,7 @@ use std::fs::OpenOptions;
 use std::io::{self, Read, Write};
 use std::path::PathBuf;
 use std::sync::RwLock;
+use faccess::PathExt;
 
 pub enum SaveAction {
     New(ActiveMetadata),
@@ -38,6 +38,7 @@ pub enum SaveAction {
 pub fn save(
     editor: &Buffer,
     headerbar: &HeaderBar,
+    window: &Window,
     path_label: &Label,
     save: &Button,
     current_file: &RwLock<Option<ActiveMetadata>>,
@@ -64,7 +65,12 @@ pub fn save(
                 }
             }
 
-            _ => (),
+            Ok(SaveAction::Canceled) => (),
+
+            _ => {
+                let error_dialog = ErrorDialog::new(&window);
+                let _ = error_dialog.run();
+            }
         }
     }
 }
@@ -96,8 +102,7 @@ fn write_data(path: Option<&ActiveMetadata>, data: &[u8]) -> io::Result<SaveActi
 
 pub fn save_before_close(
     editor: &Buffer,
-    headerbar: &HeaderBar,
-    path_label: &Label,
+    window: &Window,
     save: &Button,
     current_file: &RwLock<Option<ActiveMetadata>>,
 ) -> bool
@@ -122,7 +127,12 @@ pub fn save_before_close(
                 is_saved = true;
             }
 
-            _ => (),
+            Ok(SaveAction::Canceled) => (),
+
+            _ => {
+                let error_dialog = ErrorDialog::new(&window);
+                let _ = error_dialog.run();
+            }
         }
     }
     is_saved
@@ -143,7 +153,11 @@ pub fn open(editor: &Buffer, headerbar: &HeaderBar, path_label: &Label, current_
             let mut contents = String::new();
             let _ = file.read_to_string(&mut contents);
 
-            path_label.set_text(&new_file.to_string_lossy());
+            if new_file.writable() {
+                path_label.set_text(&new_file.to_string_lossy());
+            } else {
+                path_label.set_text(&format!("{} - [READ ONLY]", &new_file.to_string_lossy()));
+            }
             if let Some(filename) = new_file.file_name() {
                 headerbar.set_subtitle(Some(&filename.to_string_lossy()));
             }
@@ -168,7 +182,11 @@ pub fn open_from_files(
         let mut contents = String::new();
         let _ = file.read_to_string(&mut contents);
 
-        path_label.set_text(&new_file.to_string_lossy());
+        if new_file.writable() {
+            path_label.set_text(&new_file.to_string_lossy());
+        } else {
+            path_label.set_text(&format!("{} - [READ ONLY]", &new_file.to_string_lossy()));
+        }
         if let Some(filename) = new_file.file_name() {
             headerbar.set_subtitle(Some(&filename.to_string_lossy()));
         }
