@@ -11,10 +11,6 @@ install : target/release/eddit
 	cp res/com.github.maze-n.eddit.svg /usr/share/icons/hicolor/scalable/apps/
 	cp data/styles/eddit-light.xml /usr/share/gtksourceview-3.0/styles/
 	cp data/styles/eddit-dark.xml /usr/share/gtksourceview-3.0/styles/
-	cp res/icons/document-open.svg /opt/com.github.maze-n.eddit/icons/
-	cp res/icons/document-save.svg /opt/com.github.maze-n.eddit/icons/
-	cp res/icons/find.svg /opt/com.github.maze-n.eddit/icons/
-	cp res/icons/open-menu.svg /opt/com.github.maze-n.eddit/icons/
 	cp res/icons/day.svg /opt/com.github.maze-n.eddit/icons/
 	cp res/icons/night.svg /opt/com.github.maze-n.eddit/icons/
 	python make/post_install.py
