@@ -114,11 +114,14 @@ impl App {
         let current_file = Arc::new(RwLock::new(None));
         {
             let save = &self.header.save;
+            let save_as = &self.header.save_as;
+
             self.window_quit(&self.window, current_file.clone());
             self.theme_changed(&self.header.theme_switch);
             self.editor_changed(current_file.clone(), &self.header.save.clone());
             self.open_file(current_file.clone());
-            self.save_file(&save.clone(), &save, current_file.clone());
+            self.save_file(&save.clone(), &save.clone(), current_file.clone(), false);
+            self.save_file(&save, &save_as, current_file.clone(), true);
             self.font_changed(&self.header.font_button);
             self.find_replace(&self.header.find_button, &self.revealer, &self.search_bar.search_entry);
             self.key_events(current_file);
@@ -211,13 +214,13 @@ impl App {
             .connect_clicked(move |_| open(&editor, &headerbar, &path_label, &current_file));
     }
 
-    fn save_file(&self,save_button: &Button, actual_button: &Button, current_file: Arc<RwLock<Option<ActiveMetadata>>>) {
+    fn save_file(&self,save_button: &Button, actual_button: &Button, current_file: Arc<RwLock<Option<ActiveMetadata>>>, save_as: bool) {
         let editor = self.content.buff.clone();
         let headerbar = self.header.container.clone();
         let window = self.window.clone();
         let save_button = save_button.clone();
         let path_label = self.path_label.clone();
-        actual_button.connect_clicked(move |_| save(&editor, &headerbar, &window, &path_label, &save_button, &current_file));
+        actual_button.connect_clicked(move |_| save(&editor, &headerbar, &window, &path_label, &save_button, &current_file, save_as));
     }
 
     fn font_changed(&self, actual_button: &FontButton) {
@@ -376,7 +379,7 @@ impl App {
                 key if key == 's' as u32
                     && gdk.get_state().contains(gdk::ModifierType::CONTROL_MASK) =>
                 {
-                    save(&editor, &headerbar, &window, &path_label, &save_button, &current_file);
+                    save(&editor, &headerbar, &window, &path_label, &save_button, &current_file, false);
                 }
                 key if key == 'o' as u32
                     && gdk.get_state().contains(gdk::ModifierType::CONTROL_MASK) =>

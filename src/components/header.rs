@@ -24,6 +24,7 @@ pub struct Header {
     pub container: HeaderBar,
     pub open: Button,
     pub save: Button,
+    pub save_as: Button,
     pub theme_switch: Switch,
     pub font_button: FontButton,
     pub find_button: ToggleButton,
@@ -38,20 +39,21 @@ impl Header {
 
         let settings = gio::Settings::new("com.github.maze-n.eddit");
 
-        let open = Button::new();
-        open.set_image(Some(&Image::new_from_file("/opt/com.github.maze-n.eddit/icons/document-open.svg")));
+        let open = Button::new_from_icon_name(Some("document-open"), IconSize::LargeToolbar);
         open.set_tooltip_text(Some("Open a file\n   Ctrl + O"));
         open.set_valign(Align::Center);
-        let save = Button::new();
-        save.set_image(Some(&Image::new_from_file("/opt/com.github.maze-n.eddit/icons/document-save.svg")));
+        let save = Button::new_from_icon_name(Some("document-save"), IconSize::LargeToolbar);
         save.set_tooltip_text(Some("Save file\n Ctrl + S"));
         save.set_valign(Align::Center);
+        let save_as = Button::new_from_icon_name(Some("document-save-as"), IconSize::LargeToolbar);
+        save_as.set_tooltip_text(Some("Save as"));
+        save_as.set_valign(Align::Center);
         let menu_button = MenuButton::new();
         menu_button.set_tooltip_text(Some("Preferences"));
         menu_button.set_valign(Align::Center);
-        menu_button.set_image(Some(&Image::new_from_file("/opt/com.github.maze-n.eddit/icons/open-menu.svg")));
+        menu_button.set_image(Some(&Image::new_from_icon_name(Some("open-menu"), IconSize::LargeToolbar)));
         let find_button = ToggleButton::new();
-        find_button.set_image(Some(&Image::new_from_file("/opt/com.github.maze-n.eddit/icons/find.svg")));
+        find_button.set_image(Some(&Image::new_from_icon_name(Some("edit-find"), IconSize::LargeToolbar)));
         find_button.set_valign(Align::Center);
         find_button.set_tooltip_text(Some("Find and replace\n         Ctrl + F"));
 
@@ -96,6 +98,7 @@ impl Header {
 
         container.pack_start(&open);
         container.pack_start(&save);
+        container.pack_start(&save_as);
         container.pack_end(&menu_button);
         container.pack_end(&find_button);
 
@@ -103,6 +106,7 @@ impl Header {
             container,
             open,
             save,
+            save_as,
             theme_switch,
             font_button,
             find_button,

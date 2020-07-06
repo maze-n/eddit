@@ -42,9 +42,14 @@ pub fn save(
     path_label: &Label,
     save: &Button,
     current_file: &RwLock<Option<ActiveMetadata>>,
+    save_as: bool,
 ) {
     if let Some(text) = get_buffer(editor) {
-        let result = write_data(current_file.read().unwrap().as_ref(), text.as_bytes());
+        let result = if save_as {
+            write_data(None, text.as_bytes())
+        } else {
+            write_data(current_file.read().unwrap().as_ref(), text.as_bytes())
+        };
 
         match result {
             Ok(SaveAction::New(file)) => {
@@ -162,8 +167,7 @@ pub fn open(editor: &Buffer, headerbar: &HeaderBar, path_label: &Label, current_
                 headerbar.set_subtitle(Some(&filename.to_string_lossy()));
             }
 
-            *current_file.write().unwrap() =
-                Some(ActiveMetadata::new(new_file, &contents.as_bytes()));
+            *current_file.write().unwrap() = Some(ActiveMetadata::new(new_file, &contents.as_bytes()));
             editor.set_text(&contents);
             editor.place_cursor(&editor.get_start_iter());
         }
