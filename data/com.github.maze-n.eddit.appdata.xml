@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Copyright 2020 mazen <mmaz999@outlook.com> -->
+<component type="desktop">
+  <id>com.github.maze-n.eddit</id>
+  <metadata_license>CC0</metadata_license>
+  <name>eddit</name>
+  <summary>A light-weight text editor</summary>
+  <description>
+    <p>View and edit text files with this fast and light text-editor.</p>
+  </description>
+  <launchable type="desktop-id">com.github.maze-n.eddit.desktop</launchable>
+  <url type="homepage">http://github.com/maze-n/eddit</url>
+</component>

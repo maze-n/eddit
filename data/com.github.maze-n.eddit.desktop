@@ -1,17 +1,17 @@
 [Desktop Entry]
-Name=eddit
-GenericName=eddit
-Comment=Edit text files
-Categories=Accessories;TextTools;GTK;
-Icon=/usr/share/icons/hicolor/scalable/apps/com.github.maze-n.eddit.svg
-Keywords=Text;Editor;
-MimeType=text/plain
-Exec=com.github.maze-n.eddit %u
-Terminal=false
 Type=Application
+Name=eddit
+GenericName=Text editor
+Comment=View and edit text files
+Exec=com.github.maze-n.eddit %u
+Icon=/usr/share/icons/hicolor/scalable/apps/com.github.maze-n.eddit.svg
+Terminal=false
 Actions=new-empty-window;
+MimeType=text/plain
+Categories=GTK;Utility;TextEditor;
+Keywords=Text;Editor;
 
 [Desktop Action new-empty-window]
 Name=New Empty Window
 Exec=com.github.maze-n.eddit
-Icon=/usr/share/icons/hicolor/scalable/apps/com.github.maze-n.eddit.svg
+Icon=list-add

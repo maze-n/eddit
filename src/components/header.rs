@@ -36,7 +36,6 @@ impl Header {
         container.set_title(Some("eddit"));
         container.set_subtitle(Some("New file"));
         container.set_show_close_button(true);
-        container.set_decoration_layout(Some("close:maximize"));
 
         let settings = gio::Settings::new("com.github.maze-n.eddit");
 
