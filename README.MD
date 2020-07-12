@@ -1,3 +1,4 @@
+[![Github All Releases](https://img.shields.io/github/v/release/maze-n/eddit)](https://github.com/maze-n/eddit/releases)&nbsp;[![Github All Releases](https://img.shields.io/github/downloads/maze-n/eddit/total)](https://github.com/maze-n/eddit/releases)&nbsp;![Github All Releases](https://img.shields.io/github/license/maze-n/eddit)&nbsp;![Github All Releases](https://img.shields.io/github/issues/maze-n/eddit)
 <p align="center"><img src="https://raw.githubusercontent.com/maze-n/eddit/master/res/com.github.maze-n.eddit.svg?sanitize=true" width=100></p>
 <h1 align="center">eddit</h1>
 <h2 align="center">A simple text editor with GTK</h2>
