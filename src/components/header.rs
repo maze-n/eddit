@@ -87,9 +87,29 @@ impl Header {
             font_button.set_font(font.as_str());
         }
 
+        let text_wrap_header_label = Label::new(Some("Text Wrapping"));
+        text_wrap_header_label.set_halign(Align::Start);
+
+        let enable_wrapping_word = CheckButton::new_with_label("Enable text wrapping");
+
+        let enable_wrapping_char = CheckButton::new_with_label("Split words over two lines");
+
+        let revealer = Revealer::new();
+        revealer.set_transition_type(RevealerTransitionType::SlideDown);
+        revealer.add(&enable_wrapping_char);
+
+        let revealer_clone = revealer.clone();
+        enable_wrapping_word.connect_toggled(move |enable_wrapping_word| {
+            revealer_clone.set_reveal_child(enable_wrapping_word.get_active());
+        });
+
         pop_container.pack_start(&theme_selector, true, true, 0);
         pop_container.pack_start(&Separator::new(Orientation::Horizontal), true, true, 6);
         pop_container.pack_start(&font_button, true, true, 0);
+        pop_container.pack_start(&Separator::new(Orientation::Horizontal), true, true, 0);
+        pop_container.pack_start(&text_wrap_header_label, true, true, 0);
+        pop_container.pack_start(&enable_wrapping_word, true, true, 0);
+        pop_container.pack_start(&revealer, true, true, 0);
         pop_container.show_all();
 
         popover.add(&pop_container);
