@@ -28,6 +28,8 @@ pub struct Header {
     pub theme_switch: Switch,
     pub font_button: FontButton,
     pub find_button: ToggleButton,
+    pub enable_wrapping_word: CheckButton,
+    pub enable_wrapping_char: CheckButton,
 }
 
 impl Header {
@@ -130,6 +132,8 @@ impl Header {
             theme_switch,
             font_button,
             find_button,
+            enable_wrapping_word,
+            enable_wrapping_char,
         }
     }
 }
