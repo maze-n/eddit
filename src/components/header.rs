@@ -93,12 +93,17 @@ impl Header {
         text_wrap_header_label.set_halign(Align::Start);
 
         let enable_wrapping_word = CheckButton::new_with_label("Enable text wrapping");
+        let word_wrap = settings.get_boolean("text-wrap-word");
+        enable_wrapping_word.set_active(word_wrap);
 
         let enable_wrapping_char = CheckButton::new_with_label("Split words over two lines");
+        let char_wrap = settings.get_boolean("text-wrap-char");
+        enable_wrapping_char.set_active(char_wrap);
 
         let revealer = Revealer::new();
         revealer.set_transition_type(RevealerTransitionType::SlideDown);
         revealer.add(&enable_wrapping_char);
+        revealer.set_reveal_child(word_wrap);
 
         let revealer_clone = revealer.clone();
         enable_wrapping_word.connect_toggled(move |enable_wrapping_word| {
