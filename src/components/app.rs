@@ -135,9 +135,11 @@ impl App {
         let save_button = self.header.save.clone();
         let editor = self.content.buff.clone();
         let window = self.window.clone();
+        let word_wrap_checkbox = self.header.enable_wrapping_word.clone();
+        let char_wrap_checkbox = self.header.enable_wrapping_char.clone();
 
         window.connect_delete_event(move |window, _| {
-            before_quit(&window_clone);
+            before_quit(&window_clone, &word_wrap_checkbox, &char_wrap_checkbox);
             if save_button.get_sensitive() {
                 let dialog = UnsavedDialog::new(&window);
                 let result = dialog.run();

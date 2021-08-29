@@ -42,5 +42,17 @@
             <summary>Boolean value of whether the window is maximized or not</summary>
             <description>True implies dark theme is selected</description>
         </key>
+
+        <key name="text-wrap-word" type="b">
+            <default>false</default>
+            <summary>Boolean value of whether text wrap is enabled and the mode is Word or disabled</summary>
+            <description>True implies text wrapping is enabled</description>
+        </key>
+
+        <key name="text-wrap-char" type="b">
+            <default>false</default>
+            <summary>Boolean value of whether text mode is Char</summary>
+            <description>True implies text wrapping is enabled and the is set as Char</description>
+        </key>
     </schema>
 </schemalist>

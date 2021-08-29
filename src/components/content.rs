@@ -44,8 +44,12 @@ impl Content {
         buff.set_highlight_matching_brackets(false);
 
         let settings = gio::Settings::new("com.github.maze-n.eddit");
+
+        let word_wrap = settings.get_boolean("text-wrap-word");
+        let char_wrap = settings.get_boolean("text-wrap-char");
+
         if let Some(font) = settings.get_string("font") {
-            config_sourceview(&view, font.as_str().to_string());
+            config_sourceview(&view, font.as_str().to_string(), word_wrap, char_wrap);
         }
         if let Some(_) = Settings::get_default() {
             let is_dark = settings.get_boolean("is-dark");
@@ -75,7 +79,7 @@ impl Content {
     }
 }
 
-fn config_sourceview(view: &View, font: String) {
+fn config_sourceview(view: &View, font: String, word_wrap: bool, char_wrap: bool) {
     WidgetExt::override_font(view, &FontDescription::from_string(font.as_str()));
     view.set_show_line_numbers(true);
     view.set_monospace(true);
@@ -83,4 +87,16 @@ fn config_sourceview(view: &View, font: String) {
     view.set_smart_backspace(true);
     view.set_right_margin(10);
     view.set_left_margin(10);
+
+    match (word_wrap, char_wrap) {
+        (true, true) => {
+            view.set_wrap_mode(gtk::WrapMode::Char);
+        },
+        (true, _) => {
+            view.set_wrap_mode(gtk::WrapMode::Word);
+        },
+        (_, _) => {
+            view.set_wrap_mode(gtk::WrapMode::None);
+        }
+    }
 }
