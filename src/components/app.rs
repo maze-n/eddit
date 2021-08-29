@@ -123,6 +123,7 @@ impl App {
             self.save_file(&save.clone(), &save.clone(), current_file.clone(), false);
             self.save_file(&save, &save_as, current_file.clone(), true);
             self.font_changed(&self.header.font_button);
+            self.set_text_wrap_mode(&self.header, &self.content.view);
             self.find_replace(&self.header.find_button, &self.revealer, &self.search_bar.search_entry);
             self.key_events(current_file);
         }
@@ -231,6 +232,35 @@ impl App {
             if let Some(fontname) = font_button.get_font_name() {
                 WidgetExt::override_font(&view, &FontDescription::from_string(fontname.as_str()));
                 settings.set_string("font", fontname.as_str());
+            }
+        });
+    }
+
+    fn set_text_wrap_mode(&self, header: &Header, view: &View) {
+        let checkbox_wrap_word = header.enable_wrapping_word.clone();
+        let checkbox_wrap_char = header.enable_wrapping_char.clone();
+
+        let checkbox_wrap_char_clone = checkbox_wrap_char.clone();
+        
+        let view_clone = view.clone();
+        checkbox_wrap_word.connect_toggled(move |checkbox_wrap_word| {
+            if checkbox_wrap_word.get_active() {
+                view_clone.set_wrap_mode(gtk::WrapMode::Word);
+            } else {
+                checkbox_wrap_char_clone.set_active(false);
+                view_clone.set_wrap_mode(gtk::WrapMode::None);
+            }
+        });
+
+        
+        let view_clone = view.clone();
+        checkbox_wrap_char.connect_toggled(move |checkbox_wrap_char| {
+            if checkbox_wrap_word.get_active() {
+                view_clone.set_wrap_mode(gtk::WrapMode::Word);
+            }
+
+            if checkbox_wrap_char.get_active() {
+                view_clone.set_wrap_mode(gtk::WrapMode::Char);
             }
         });
     }
