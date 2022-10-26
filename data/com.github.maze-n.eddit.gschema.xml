@@ -3,14 +3,14 @@
     <schema path="/com/github/maze-n/eddit/" id="com.github.maze-n.eddit">
         <key name="pos-x" type="i">
             <default>-1</default>
-            <summary>Horizontal Postition</summary>
-            <description>The saved horizontal postion of the window</description>
+            <summary>Horizontal Position</summary>
+            <description>The saved horizontal position of the window</description>
         </key>
 
         <key name="pos-y" type="i">
             <default>-1</default>
-            <summary>Vertical Postition</summary>
-            <description>The saved vertical postion of the window</description>
+            <summary>Vertical Position</summary>
+            <description>The saved vertical position of the window</description>
         </key>
 
         <key name="window-width" type="i">
